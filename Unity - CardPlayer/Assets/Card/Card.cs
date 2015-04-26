@@ -1,5 +1,5 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections;
 
 [RequireComponent(typeof(Renderer))]
 public class Card : MonoBehaviour
@@ -7,6 +7,10 @@ public class Card : MonoBehaviour
 
     [SerializeField]
     private string _name;
+    public string Name
+    {
+        get { return _name; }
+    }
 
     private CardInfo _info;
 
@@ -15,5 +19,4 @@ public class Card : MonoBehaviour
         _info = CardInfo.Get.ByName(_name);
         GetComponent<Renderer>().material = ImageLoader.Instance.GetMaterialFor(_info);
     }
-
 }

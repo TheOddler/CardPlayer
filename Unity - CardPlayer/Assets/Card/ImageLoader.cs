@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System.Collections.Generic; 
+using System.Collections.Generic;
 
 public class ImageLoader : MonoBehaviour
 {
@@ -59,7 +59,9 @@ public class ImageLoader : MonoBehaviour
     {
         //url = WWW.EscapeURL(url);
 
-        var www = new WWW(url);
+        WWWForm form = new WWWForm();
+        form.AddField("Origin", "null");
+        WWW www = new WWW(url, form);
         yield return www;
 
         if (www.error == null)
@@ -68,12 +70,55 @@ public class ImageLoader : MonoBehaviour
             www.LoadImageIntoTexture(texture as Texture2D);
             texture.anisoLevel = 4;
 
-            Debug.Log("Image loaded: " + url);
+            //Debug.Log("Image loaded: " + url);
             mat.mainTexture = texture;
         }
         else
         {
             Debug.Log("Failed to load image: " + url + "; error: " + www.error);
         }
+    }
+
+    IEnumerator LoadImageIntoWithBypass(string url, Material mat)
+    {
+        //url = WWW.EscapeURL(url);
+
+        var www = new WWW(BypassCrosdomain(url));
+
+        Debug.Log("Url: " + www.url);
+
+        yield return www;
+
+        if (www.error == null)
+        {
+            string withPadding = www.text;
+            int imageStart = withPadding.LastIndexOf("<p>") + 3;
+            int imageEnd = withPadding.LastIndexOf("</p>");
+
+            Debug.Log("start: " + imageStart + "; end: " + imageEnd);
+
+            byte[] bytes = www.bytes;
+            byte[] imageBytes = new byte[imageEnd - imageStart];
+            System.Array.Copy(bytes, imageStart, imageBytes, 0, imageEnd - imageStart);
+
+            var texture = new Texture2D(1, 1/*, TextureFormat.DXT1, false*/);
+            texture.LoadImage(imageBytes);
+            //www.LoadImageIntoTexture(texture as Texture2D);
+            texture.anisoLevel = 4;
+
+            //Debug.Log("Image loaded: " + url);
+            mat.mainTexture = texture;
+        }
+        else
+        {
+            Debug.Log("Failed to load image: " + url + "; error: " + www.error);
+        }
+    }
+
+    private static string BypassCrosdomain(string url)
+    {
+        return "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D'" +
+                url + //Double encoding fixes the 400 error you get when having spaces
+                "'%0A&format=XML";
     }
 }

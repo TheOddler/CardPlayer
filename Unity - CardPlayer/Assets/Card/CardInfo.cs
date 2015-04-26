@@ -73,6 +73,7 @@ public class CardInfo
             else
             {
                 card = new CardInfo(name, nameSimple);
+                InfoLoader.Instance.LoadInfoFor(card);
                 _knownInfo[nameSimple] = card;
             }
 
