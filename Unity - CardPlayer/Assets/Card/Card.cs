@@ -16,7 +16,7 @@ public class Card : MonoBehaviour
 
     void Start()
     {
-	    _info = CardDatabase.Instance.GetByName(_name);
+        _info = CardInfoGatherer.Get.ByName(_name);
 	    GetComponent<Renderer>().material = _info.Material;
     }
 }
