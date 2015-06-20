@@ -1,10 +1,28 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections.Generic;
+using System.Text;
 
 public static class Helpers
-{	
-	public static string ReplaceURLEscaped(this string url, string tag, string value)
-	{
-		return url.Replace(tag, WWW.EscapeURL(value));
-	}
+{
+    //
+    // Special characters
+    // ---
+    private static readonly Dictionary<string, string> SPECIAL_MAPPING = new Dictionary<string, string>(System.StringComparer.OrdinalIgnoreCase)
+    {
+        {"œ", "oe"},
+        {"Ÿ", "Y"},
+        {"À", "A"}, {"Á", "A"}, {"Â", "A"}, {"Ã", "A"}, {"Ä", "A"},
+        {"Æ", "AE"},
+        {"é", "e"},
+        {"/",""}
+    };
+
+    public static string SimplifySpecialCharacter(this string text)
+    {
+        var output = new StringBuilder(text);
+        foreach (var kvp in SPECIAL_MAPPING)
+        {
+            output.Replace(kvp.Key, kvp.Value);
+        }
+        return output.ToString();
+    }
 }
