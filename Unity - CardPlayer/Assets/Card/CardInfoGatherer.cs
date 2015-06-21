@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using IEnumerator = System.Collections.IEnumerator;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 public class CardInfoGatherer : MonoBehaviour
 {
@@ -16,9 +17,11 @@ public class CardInfoGatherer : MonoBehaviour
     //
     // Settings
     // ---
+    [TextArea(1, 1)]
     [SerializeField]
     private string _baseInfoUrl;
 
+    [TextArea(1, 1)]
     [SerializeField]
     private string _baseImageUrl;
 
@@ -77,7 +80,7 @@ public class CardInfoGatherer : MonoBehaviour
     }
     IEnumerator LoadInfoFor(CardInfo card)
     {
-        string url = card.FillInfoIn(_baseInfoUrl, true);
+        string url = card.FillInfoIn(_baseInfoUrl);
 
         WWW www = new WWW(url);
 
@@ -85,8 +88,8 @@ public class CardInfoGatherer : MonoBehaviour
 
         if (www.error == null)
         {
-            card.Extra = new JSONObject(www.text);
-            Debug.Log("Succesfully loaded info for " + card.Name + "\n" + card.Extra.ToString());
+            card.Extra = JObject.Parse(www.text);
+            //Debug.Log("Succesfully loaded info for " + card.Name + "\n" + card.Extra.ToString());
         }
         else
         {
@@ -95,7 +98,7 @@ public class CardInfoGatherer : MonoBehaviour
     }
     IEnumerator LoadImageFor(CardInfo card)
     {
-        string url = card.FillInfoIn(_baseImageUrl, true);
+        string url = card.FillInfoIn(_baseImageUrl);
 
         WWW www = new WWW(url);
         yield return www;

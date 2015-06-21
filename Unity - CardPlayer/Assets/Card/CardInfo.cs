@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json.Linq;
 
 public class CardInfo
 {
@@ -29,7 +30,7 @@ public class CardInfo
         get { return _material; }
     }
 
-    public JSONObject Extra { get; set; }
+    public JObject Extra { get; set; }
 
     private string _simpleName;
     public string SimpleName
@@ -47,28 +48,41 @@ public class CardInfo
     //
     // Interpreter
     // ---
-    static readonly Regex DB_TOKEN_REGEX = new Regex(@"{{(.+)}}");
     static readonly Regex TOKEN_REGEX = new Regex(@"{(.+)}");
     static readonly Dictionary<string, System.Func<CardInfo, string>> TOKENS = new Dictionary<string, System.Func<CardInfo, string>>(System.StringComparer.OrdinalIgnoreCase)
     {
-        {"name", c => c.Name},
-        {"sname", c => c.SimpleName}
+        {"name", c => WWW.EscapeURL(c.Name)},
+        {"sname", c => WWW.EscapeURL(c.SimpleName)},
+        {"name_ne", c => c.Name},
+        {"sname_ne", c => c.SimpleName}
     };
 
-    public string FillInfoIn(string text, bool escapeForUrl = false)
+    public string FillInfoIn(string text)
     {
-        string firstPass = DB_TOKEN_REGEX.Replace(text, match => GetFromDatabase(match.Groups[1].Value, escapeForUrl));
-        return TOKEN_REGEX.Replace(firstPass, match => GetTokenValue(match.Groups[1].Value, escapeForUrl));
+        return TOKEN_REGEX.Replace(text, match => GetTokenValue(match.Groups[1].Value));
     }
 
-    private string GetTokenValue(string token, bool escapeForUrl)
+    private string GetTokenValue(string token)
     {
-        string value = TOKENS[token](this);
-        return escapeForUrl ? WWW.EscapeURL(value) : value;
-    }
-
-    private string GetFromDatabase(string token, bool escapeForUrl = false)
-    {
-        return ""; //TODO
+        // First see if the token one of my own tokens, so no jsonpath thing
+        if (TOKENS.ContainsKey(token))
+        {
+            return TOKENS[token](this);
+        }
+        else // If not, treat is as a jsonpath and try to find the info
+        {
+            try
+            {
+                var valueArray = Extra.SelectTokens(token);
+                //Debug.Log("Getting token (" + token + ") out of " + Extra);
+                //Debug.Log("Gotten value array is: " + valueArray);
+                return valueArray.First().ToString();
+            }
+            catch (System.Exception e)
+            {
+                Debug.Log("Failed getting token: " + e.Message);
+                return "ERROR";
+            }
+        }
     }
 }
