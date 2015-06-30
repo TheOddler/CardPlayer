@@ -4,7 +4,6 @@ using System.Collections;
 [RequireComponent(typeof(Renderer))]
 public class Card : MonoBehaviour
 {
-
     [SerializeField]
     private string _name;
     public string Name
@@ -16,7 +15,7 @@ public class Card : MonoBehaviour
 
     void Start()
     {
-        _info = CardInfoGatherer.Get.ByName(_name);
+        _info = CardInfoProvider.Get.ByName(_name);
 	    GetComponent<Renderer>().material = _info.Material;
     }
 }

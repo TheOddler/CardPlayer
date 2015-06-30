@@ -30,18 +30,16 @@ public class CardInfo
         get { return _material; }
     }
 
-    public JObject Extra { get; set; }
+    public JToken Extra { get; set; }
 
-    private string _simpleName;
+    //
+    // Other info
+    // ---
     public string SimpleName
     {
         get
         {
-            if (_simpleName == null)
-            {
-                _simpleName = _name.SimplifySpecialCharacter();
-            }
-            return _simpleName;
+            return _name.SimplifySpecialCharacter().ToLowerInvariant();
         }
     }
 
@@ -59,30 +57,36 @@ public class CardInfo
 
     public string FillInfoIn(string text)
     {
-        return TOKEN_REGEX.Replace(text, match => GetTokenValue(match.Groups[1].Value));
+        return TOKEN_REGEX.Replace(text, match => TranslateToken(match.Groups[1].Value));
     }
 
-    private string GetTokenValue(string token)
+    private string TranslateToken(string token)
     {
         // First see if the token one of my own tokens, so no jsonpath thing
         if (TOKENS.ContainsKey(token))
         {
             return TOKENS[token](this);
         }
-        else // If not, treat is as a jsonpath and try to find the info
+        else if (Extra != null)// If not, treat is as a jsonpath and try to find the info
         {
             try
             {
                 var valueArray = Extra.SelectTokens(token);
-                //Debug.Log("Getting token (" + token + ") out of " + Extra);
-                //Debug.Log("Gotten value array is: " + valueArray);
-                return valueArray.First().ToString();
+                return valueArray.First().ToString(); //TODO allow other values than just the first
             }
             catch (System.Exception e)
             {
-                Debug.Log("Failed getting token: " + e.Message);
-                return "ERROR";
+                Debug.Log("Failed translating token: " + e.Message
+                    + "\nCard: " + Name
+                    + "\nToken: " + token
+                    + "\nExtra data: " + Extra);
             }
         }
+        else
+        {
+            Debug.Log("Failed translating token. It's not a default token, and extra info is null.");
+        }
+
+        return "ERROR";
     }
 }
