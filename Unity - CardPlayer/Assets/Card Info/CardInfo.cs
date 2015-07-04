@@ -60,25 +60,25 @@ public class CardInfo
         return TOKEN_REGEX.Replace(text, match => TranslateToken(match.Groups[1].Value));
     }
 
-    private string TranslateToken(string token)
+    private string TranslateToken(string path)
     {
         // First see if the token one of my own tokens, so no jsonpath thing
-        if (TOKENS.ContainsKey(token))
+        if (TOKENS.ContainsKey(path))
         {
-            return TOKENS[token](this);
+            return TOKENS[path](this);
         }
         else if (Extra != null)// If not, treat is as a jsonpath and try to find the info
         {
             try
             {
-                var valueArray = Extra.SelectTokens(token);
-                return valueArray.First().ToString(); //TODO allow other values than just the first
+                var valueArray = Extra.SelectTokens(path);
+                return valueArray.Last().ToString(); //TODO allow other values than just the last
             }
             catch (System.Exception e)
             {
                 Debug.Log("Failed translating token: " + e.Message
                     + "\nCard: " + Name
-                    + "\nToken: " + token
+                    + "\nToken: " + path
                     + "\nExtra data: " + Extra);
             }
         }
