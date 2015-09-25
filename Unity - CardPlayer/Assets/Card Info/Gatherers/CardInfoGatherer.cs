@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 using IEnumerator = System.Collections.IEnumerator;
 using Newtonsoft.Json.Linq;
 
@@ -17,7 +18,9 @@ public class CardInfoGatherer
     {
         string url = card.FillInfoIn(_baseInfoUrl);
 
-        WWW www = new WWW(url);
+        var headers = new Dictionary<string,string>();
+        headers["Access-Control-Allow-Origin"] = "*";
+        WWW www = new WWW(url, null, headers);
 
         yield return www;
 
@@ -48,7 +51,10 @@ public class CardInfoGatherer
     {
         string url = card.FillInfoIn(_baseImageUrl);
 
-        WWW www = new WWW(url);
+        var headers = new Dictionary<string, string>();
+        headers["Access-Control-Allow-Origin"] = "*";
+        WWW www = new WWW(url, null, headers);
+
         yield return www;
 
         if (www.error == null)
