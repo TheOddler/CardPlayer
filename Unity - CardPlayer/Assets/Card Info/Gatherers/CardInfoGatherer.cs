@@ -45,6 +45,8 @@ public class CardInfoGatherer
             Debug.Log("Failed to load info for: " + card.Name + "; url: " + url + "; error: " + www.error + "\n" + www.text);
             success(false);
         }
+        
+        www.Dispose();
     }
 
     public IEnumerator LoadImageFor(CardInfo card, System.Action<bool> success)
@@ -69,5 +71,7 @@ public class CardInfoGatherer
             Debug.Log("Failed to load image for " + card.Name + " from " + url + " with error: " + www.error);
             success(false);
         }
+        
+        www.Dispose();
     }
 }

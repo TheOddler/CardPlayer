@@ -27,6 +27,13 @@ sysinfo.txt
 *.blend[12345].meta
 
 #
+# VS Code
+# ---
+Assets/*/Editor/VSCode.cs
+Assets/*/Editor/VSCode.cs.meta
+*.vscode
+
+#
 # 3rd Party Editor plugins
 # ---
 Assets/[Pp]lugins/[Ee]ditor/[Ss]cript[Ii]nspector3.meta
