@@ -23,7 +23,7 @@ public class Player : NetworkBehaviour
 			if (Physics.Raycast(ray, out hit))
 			{
 				CmdSpawnCard("Ponder", hit.point);
-            }
+			}
 		}
 	}
 
