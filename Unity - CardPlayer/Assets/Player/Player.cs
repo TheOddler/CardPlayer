@@ -35,4 +35,10 @@ public class Player : NetworkBehaviour
 		card.Name = name;
 		NetworkServer.SpawnWithClientAuthority(card.gameObject, gameObject);
 	}
+	
+	void OnGUI()
+	{
+		//Temp fix for crash when building WebGL with codestripping enabled.
+		//Should be fixed in Unity 5.3.
+	}
 }
