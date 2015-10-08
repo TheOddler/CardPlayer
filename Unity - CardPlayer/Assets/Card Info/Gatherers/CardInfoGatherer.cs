@@ -18,9 +18,7 @@ public class CardInfoGatherer
 	{
 		string url = card.FillInfoIn(_baseInfoUrl);
 
-		var headers = new Dictionary<string,string>();
-		headers["Access-Control-Allow-Origin"] = "*";
-		WWW www = new WWW(url, null, headers);
+		WWW www = new WWW(url);
 
 		yield return www;
 
@@ -28,7 +26,7 @@ public class CardInfoGatherer
 		{
 			try
 			{
-				card.Extra = JToken.Parse(www.text);
+				card.Extra = new JsonInfo(JToken.Parse(www.text));
 				//Debug.Log("Succesfully loaded info for " + card.Name + "\n" + card.Extra.ToString());
 				success(true);
 			}
@@ -53,9 +51,7 @@ public class CardInfoGatherer
 	{
 		string url = card.FillInfoIn(_baseImageUrl);
 
-		var headers = new Dictionary<string, string>();
-		headers["Access-Control-Allow-Origin"] = "*";
-		WWW www = new WWW(url, null, headers);
+		WWW www = new WWW(url);
 
 		yield return www;
 

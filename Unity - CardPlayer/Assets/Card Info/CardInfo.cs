@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json.Linq;
 
 public class CardInfo
 {
@@ -30,7 +29,7 @@ public class CardInfo
 		get { return _material; }
 	}
 
-	public JToken Extra { get; set; }
+	public ExtraCardInfo Extra { get; set; }
 
 	//
 	// Other info
@@ -67,20 +66,10 @@ public class CardInfo
 		{
 			return TOKENS[path](this);
 		}
-		else if (Extra != null)// If not, treat is as a jsonpath and try to find the info
+		// If not, check the extra info
+		else if (Extra != null)
 		{
-			try
-			{
-				var valueArray = Extra.SelectTokens(path);
-				return valueArray.Last().ToString(); //TODO allow other values than just the last
-			}
-			catch (System.Exception e)
-			{
-				Debug.Log("Failed translating token: " + e.Message
-					+ "\nCard: " + Name
-					+ "\nToken: " + path
-					+ "\nExtra data: " + Extra);
-			}
+			return Extra.TranslateToken(path);
 		}
 		else
 		{

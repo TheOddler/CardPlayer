@@ -42,27 +42,22 @@ public class CardInfoProvider : MonoBehaviour
 	// ---
 	public CardInfo ByName(string name)
 	{
-		return GetExistingOrDefault(name) ?? CreateCardInfoFor(name);
-	}
-	// Checks if there is an existing one, if not, returns null
-	private CardInfo GetExistingOrDefault(string name)
-	{
+		// If we already have info for this card return that
 		if (_knownInfo.ContainsKey(name))
 		{
 			return _knownInfo[name];
 		}
-		return null;
-	}
-	// Creates card info, also starts routines to get additional info
-	private CardInfo CreateCardInfoFor(string name)
-	{
-		Material mat = new Material(_frontMaterial);
-		CardInfo card = new CardInfo(name, mat);
-		_knownInfo[name] = card;
-
-		LoadInfoAndImageFor(card);
-
-		return card;
+		// Otherwise create default info and gather its extra info and image
+		else
+		{
+			Material mat = new Material(_frontMaterial); // Copy of the default front material, the actual image will be loaded into this
+			CardInfo card = new CardInfo(name, mat);
+			_knownInfo[name] = card; // Remember this for later
+	
+			LoadInfoAndImageFor(card);
+	
+			return card;
+		}
 	}
 
 	//
@@ -88,5 +83,12 @@ public class CardInfoProvider : MonoBehaviour
 			if (/*infoSuccess &&*/ imageSuccess) break;
 			Debug.Log("Trying another gatherer for: " + card.Name);
 		}
+	}
+	
+	
+	
+	void OnGUI() 
+	{
+		GUI.Label(new Rect(10,10,2000,30), "Data: " + Application.persistentDataPath);
 	}
 }
