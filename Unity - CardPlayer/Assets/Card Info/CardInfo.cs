@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 public class CardInfo
 {
@@ -28,54 +27,36 @@ public class CardInfo
 	{
 		get { return _material; }
 	}
-
-	public ExtraCardInfo Extra { get; set; }
-
+	
 	//
-	// Other info
+	// Extra Info
 	// ---
-	public string SimpleName
+	private List<ExtraCardInfo> _extras = new List<ExtraCardInfo>();
+	public void AddExtraInfo(ExtraCardInfo extra)
 	{
-		get
-		{
-			return _name.SimplifySpecialCharacter().ToLowerInvariant();
-		}
+		_extras.Add(extra);
 	}
-
-	//
-	// Interpreter
-	// ---
-	static readonly Regex TOKEN_REGEX = new Regex(@"{(.+)}");
-	static readonly Dictionary<string, System.Func<CardInfo, string>> TOKENS = new Dictionary<string, System.Func<CardInfo, string>>(System.StringComparer.OrdinalIgnoreCase)
+	
+	private static readonly Dictionary<string, System.Func<CardInfo, string>> DEFAULT_TOKENS = new Dictionary<string, System.Func<CardInfo, string>>(System.StringComparer.OrdinalIgnoreCase)
 	{
-		{"name", c => WWW.EscapeURL(c.Name)},
-		{"sname", c => WWW.EscapeURL(c.SimpleName)},
-		{"name_ne", c => c.Name},
-		{"sname_ne", c => c.SimpleName}
+		{ "name", 		c => WWW.EscapeURL(c.Name) },
+		{ "sname", 		c => WWW.EscapeURL(c.Name.SimplifySpecialCharacter().ToLowerInvariant()) },
+		{ "name_ne", 	c => c.Name },
+		{ "sname_ne", 	c => c.Name.SimplifySpecialCharacter().ToLowerInvariant() }
 	};
-
-	public string FillInfoIn(string text)
+	public string GetExtraInfoById(string id)
 	{
-		return TOKEN_REGEX.Replace(text, match => TranslateToken(match.Groups[1].Value));
-	}
-
-	private string TranslateToken(string path)
-	{
-		// First see if the token one of my own tokens, so no jsonpath thing
-		if (TOKENS.ContainsKey(path))
-		{
-			return TOKENS[path](this);
+		if (DEFAULT_TOKENS.ContainsKey(id)) {
+			return DEFAULT_TOKENS[id](this);
 		}
-		// If not, check the extra info
-		else if (Extra != null)
+		else 
 		{
-			return Extra.TranslateToken(path);
+			foreach(var extra in _extras)
+			{
+				var info = extra.GetById(id);
+				if (info != null) return info;
+			}
 		}
-		else
-		{
-			Debug.Log("Failed translating token. It's not a default token, and extra info is null.");
-		}
-
-		return "ERROR";
+		return null;
 	}
 }

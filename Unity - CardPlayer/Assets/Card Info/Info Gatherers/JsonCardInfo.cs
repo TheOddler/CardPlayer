@@ -1,18 +1,24 @@
-using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 
-public class JsonInfo:
+public class JsonCardInfo:
 	ExtraCardInfo
 {
 	private JToken _info;
+	private JsonCardInfoGatherer _parent;
 	
-	public JsonInfo(JToken info)
+	public JsonCardInfo(JToken info, JsonCardInfoGatherer parent)
 	{
 		_info = info;
+		_parent = parent;
 	}
 	
-	public string TranslateToken(string path)
+	public string GetById(string id)
+	{
+		return GetByPath(_parent.GetTokenValueFor(id));
+	}
+	
+	public string GetByPath(string path)
 	{
 		// First see if the token one of my own tokens, so no jsonpath thing
 		try
@@ -22,6 +28,6 @@ public class JsonInfo:
 		}
 		catch (System.Exception) { }
 		
-		return "ERROR";
+		return "ERROR"; //TODO better solution?
 	}
 }

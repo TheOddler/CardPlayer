@@ -1,0 +1,5 @@
+[
+	{
+		"_baseUrl": "{image_url}"
+	}
+]

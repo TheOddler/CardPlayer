@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using IEnumerator = System.Collections.IEnumerator;
 using System.Collections.Generic;
-using System.Linq;
+using Newtonsoft.Json;
 
 public class CardInfoProvider : MonoBehaviour
 {
@@ -19,13 +19,18 @@ public class CardInfoProvider : MonoBehaviour
 	// ---
 	[SerializeField]
 	private Material _frontMaterial;
-
+	
 	[SerializeField]
-	private List<CardInfoGatherer> _gatherers;
+	private TextAsset _infoGatherersFile;
+	
+	[SerializeField]
+	private TextAsset _imageGatherersFile;
 
 	//
 	// Data
 	// ---
+	private List<CardInfoGatherer> _infoGatherers = new List<CardInfoGatherer>();
+	private List<CardImageGatherer> _imageGatherers = new List<CardImageGatherer>();
 	private Dictionary<string, CardInfo> _knownInfo = new Dictionary<string, CardInfo>();
 
 	//
@@ -35,6 +40,31 @@ public class CardInfoProvider : MonoBehaviour
 	{
 		if (_instance != null) throw new UnityException("Multiple card info providers in the scene.");
 		_instance = this;
+		
+		var autoTypeNameHandling = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto };
+		_infoGatherers = JsonConvert.DeserializeObject<List<CardInfoGatherer>>(_infoGatherersFile.text, autoTypeNameHandling);
+		_imageGatherers = JsonConvert.DeserializeObject<List<CardImageGatherer>>(_imageGatherersFile.text, autoTypeNameHandling);
+		
+		/*var mtgapi = new JsonCardInfoGatherer("https://api.mtgapi.com/v2/cards?name={name}", new Dictionary<string, string>()
+		{
+			{"image_url", "$..gatherer"}
+		});
+		var deckbrew = new JsonCardInfoGatherer("https://api.deckbrew.com/mtg/cards?name={name}", new Dictionary<string, string>()
+		{
+			{"image_url", "$..image_url"}
+		});
+		_infoGatherers.Add(mtgapi);
+		_infoGatherers.Add(deckbrew);
+		
+		var directImage = new CardImageGatherer("{image_url}");
+		_imageGatherers.Add(directImage);
+		
+		string savedInfoGatherers = JsonConvert.SerializeObject(_infoGatherers, Formatting.Indented, autoTypeNameHandling);
+		Debug.Log("Info Gatherers:\n" + savedInfoGatherers);
+		
+		string savedImageGatherers = JsonConvert.SerializeObject(_imageGatherers);
+		Debug.Log("Image Gatherers:\n" + savedImageGatherers);
+		*/
 	}
 
 	//
@@ -67,21 +97,22 @@ public class CardInfoProvider : MonoBehaviour
 	{
 		StartCoroutine(TryLoadInfoAndImageFor(card));
 	}
-
+	
 	IEnumerator TryLoadInfoAndImageFor(CardInfo card)
 	{
-		foreach (var gatherer in _gatherers)
+		// First let all gatherers gather info
+		foreach (var gatherer in _infoGatherers)
 		{
-			bool infoSuccess = false;
-			yield return StartCoroutine(gatherer.LoadInfoFor(card, s => { infoSuccess = s; }));
-
-			if (!infoSuccess) continue;
-
-			bool imageSuccess = false;
-			yield return StartCoroutine(gatherer.LoadImageFor(card, s => { imageSuccess = s; }));
-
-			if (/*infoSuccess &&*/ imageSuccess) break;
-			Debug.Log("Trying another gatherer for: " + card.Name);
+			yield return StartCoroutine(gatherer.LoadInfoFor(card));
+		}
+		
+		// Now try each image gatherer one by one to get an image
+		foreach (var gatherer in _imageGatherers)
+		{
+			bool success = false;
+			yield return StartCoroutine(gatherer.LoadImageFor(card, s => { success = s; }));
+			if (success) break;
+			//Debug.Log("Trying another image gatherer for: " + card.Name);
 		}
 	}
 	
