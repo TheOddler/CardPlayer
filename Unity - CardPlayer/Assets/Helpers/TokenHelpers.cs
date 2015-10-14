@@ -5,10 +5,13 @@ public static class TokenHelpers
 {
 	private static readonly Regex TOKEN_REGEX = new Regex(@"{(.+)}");
 	
-	public static string FillInfoIn(string text, CardInfo info)
+	public static string FillAllTokensIn(string text, CardInfo info)
 	{
-		return TOKEN_REGEX.Replace(text, match => 
-				info.GetExtraInfoById(match.Groups[1].Value)
-			);
+		return TOKEN_REGEX.Replace(text, match => TranslateToken(match.Groups[1].Value, info));
+	}
+	
+	public static string TranslateToken(string token, CardInfo info)
+	{
+		return null;
 	}
 }

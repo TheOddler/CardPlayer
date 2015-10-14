@@ -13,7 +13,7 @@ public class CardInfoProvider : MonoBehaviour
 	{
 		get { return _instance; }
 	}
-
+	
 	//
 	// Settings
 	// ---
@@ -25,14 +25,16 @@ public class CardInfoProvider : MonoBehaviour
 	
 	[SerializeField]
 	private TextAsset _imageGatherersFile;
-
+	
 	//
 	// Data
 	// ---
 	private List<CardInfoGatherer> _infoGatherers = new List<CardInfoGatherer>();
 	private List<CardImageGatherer> _imageGatherers = new List<CardImageGatherer>();
+	
 	private Dictionary<string, CardInfo> _knownInfo = new Dictionary<string, CardInfo>();
-
+	private Queue<CardInfo> _gatheringQueue = new Queue<CardInfo>();
+	
 	//
 	// Init
 	// ---
@@ -45,53 +47,57 @@ public class CardInfoProvider : MonoBehaviour
 		_infoGatherers = JsonConvert.DeserializeObject<List<CardInfoGatherer>>(_infoGatherersFile.text, autoTypeNameHandling);
 		_imageGatherers = JsonConvert.DeserializeObject<List<CardImageGatherer>>(_imageGatherersFile.text, autoTypeNameHandling);
 	}
-
+	
+	void Start()
+	{
+		StartCoroutine(GatheringLoop());
+	}
+	
 	//
 	// Getters
 	// ---
 	public CardInfo ByName(string name)
 	{
-		// If we already have info for this card return that
-		if (_knownInfo.ContainsKey(name))
-		{
-			return _knownInfo[name];
-		}
-		// Otherwise create default info and gather its extra info and image
-		else
+		if (!_knownInfo.ContainsKey(name))
 		{
 			Material mat = new Material(_frontMaterial); // Copy of the default front material, the actual image will be loaded into this
 			CardInfo card = new CardInfo(name, mat);
 			_knownInfo[name] = card; // Remember this for later
-	
-			LoadInfoAndImageFor(card);
-	
-			return card;
-		}
-	}
-
-	//
-	// Info Gatherers
-	// ---
-	void LoadInfoAndImageFor(CardInfo card)
-	{
-		StartCoroutine(TryLoadInfoAndImageFor(card));
-	}
-	
-	IEnumerator TryLoadInfoAndImageFor(CardInfo card)
-	{
-		// First let all gatherers gather info
-		foreach (var gatherer in _infoGatherers)
-		{
-			yield return StartCoroutine(gatherer.LoadInfoFor(card));
 		}
 		
-		// Now try each image gatherer one by one to get an image
-		foreach (var gatherer in _imageGatherers)
+		return _knownInfo[name];
+	}
+	
+	//
+	// Gathering
+	// ---
+	public void RequestUpdateFor(CardInfo card)
+	{
+		if (!_gatheringQueue.Contains(card))
 		{
-			bool success = false;
-			yield return StartCoroutine(gatherer.LoadImageFor(card, s => { success = s; }));
-			if (success) break;
-			//Debug.Log("Trying another image gatherer for: " + card.Name);
+			_gatheringQueue.Enqueue(card);
+		}
+	}
+	
+	IEnumerator GatheringLoop()
+	{
+		yield return new WaitForEndOfFrame();
+		while(true)
+		{
+			if(_gatheringQueue.Count <= 0)
+			{
+				yield return null;
+			}
+			else
+			{
+				var card = _gatheringQueue.Dequeue();
+				
+				// Gather all possible info. TODO: only gather what is really needed
+				foreach (var gatherer in _infoGatherers)
+				{
+					yield return StartCoroutine(gatherer.LoadInfoFor(card));
+				}
+			}
 		}
 	}
 	

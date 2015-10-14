@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using IEnumerator = System.Collections.IEnumerator;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Linq;
 
 [JsonObject(MemberSerialization.OptIn)]
 public class JsonCardInfoGatherer: CardInfoGatherer
@@ -11,25 +12,25 @@ public class JsonCardInfoGatherer: CardInfoGatherer
 	private string _baseUrl;
 	
 	[JsonProperty]
-	private Dictionary<string, string> _tokens;
+	private Dictionary<string, string> _infoPaths;
 	
-	public JsonCardInfoGatherer(string baseUrl, Dictionary<string, string> tokens)
+	public JsonCardInfoGatherer(string baseUrl, Dictionary<string, string> infoPaths)
 	{
 		_baseUrl = baseUrl;
-		_tokens = tokens;
+		_infoPaths = infoPaths;
 	}
 	
 	public ICollection<string> PotentialHits
 	{
 		get 
 		{
-			return _tokens.Keys;
+			return _infoPaths.Keys;
 		}
 	}
 
 	public IEnumerator LoadInfoFor(CardInfo card)
 	{
-		string url = TokenHelpers.FillInfoIn(_baseUrl, card);
+		string url = TokenHelpers.FillAllTokensIn(_baseUrl, card);
 		using (WWW www = new WWW(url))
 		{
 			yield return www;
@@ -39,8 +40,8 @@ public class JsonCardInfoGatherer: CardInfoGatherer
 				try
 				{
 					JToken info = JToken.Parse(www.text);
-					card.AddExtraInfo(new JsonCardInfo(info, this));
-					//Debug.Log("Succesfully loaded info for " + card.Name + "\nAdded info: " + info.ToString());
+					AddInfoTo(card, info);
+					Debug.Log("Succesfully loaded info for " + card.Name + "\nAdded info: " + info.ToString());
 				}
 				catch (System.Exception e)
 				{
@@ -54,9 +55,14 @@ public class JsonCardInfoGatherer: CardInfoGatherer
 		}
 	}
 	
-	public string GetTokenValueFor(string id)
+	void AddInfoTo(CardInfo card, JToken info)
 	{
-		string value;
-		return _tokens.TryGetValue(id, out value) ? value : null;
+		foreach(var infoPath in _infoPaths)
+		{
+			// get value from json
+			string newValue = info.SelectTokens(infoPath.Value).Last().ToString();
+			// set value in the card
+			card.GetExtraInfoById(infoPath.Key).UpdateValue(newValue);
+		}
 	}
 }

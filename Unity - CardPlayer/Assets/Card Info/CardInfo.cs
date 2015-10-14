@@ -4,59 +4,62 @@ using System.Linq;
 
 public class CardInfo
 {
+	public const string NAME_TOKEN = "name";
+	
 	//
 	// Constructors
 	// ---
 	public CardInfo(string name, Material mat)
 	{
-		_name = name;
+		_info.Add(NAME_TOKEN, new Updateable<string>(name));
 		_material = mat;
 	}
-
+	
 	//
 	// Info
 	// ---
-	private string _name;
-	public string Name
-	{
-		get { return _name; }
-	}
-
+	private Dictionary<string, Updateable<string>> _info = new Dictionary<string, Updateable<string>>(System.StringComparer.InvariantCultureIgnoreCase);
+	
 	private Material _material;
 	public Material Material
 	{
 		get { return _material; }
 	}
 	
-	//
-	// Extra Info
-	// ---
-	private List<ExtraCardInfo> _extras = new List<ExtraCardInfo>();
-	public void AddExtraInfo(ExtraCardInfo extra)
+	public IEnumerable<string> MissingInfo
 	{
-		_extras.Add(extra);
+		get { return _info.Where(kvp => kvp.Value == null).Select(kvp => kvp.Key); }
 	}
 	
-	private static readonly Dictionary<string, System.Func<CardInfo, string>> DEFAULT_TOKENS = new Dictionary<string, System.Func<CardInfo, string>>(System.StringComparer.OrdinalIgnoreCase)
+	//
+	// Convenience functions
+	// ---
+	public string Name
+	{
+		get
+		{
+			return _info[NAME_TOKEN].Value;
+		}
+	}
+	
+	//
+	// Methods
+	// ---
+	public Updateable<string> GetExtraInfoById(string id)
+	{
+		if (!_info.ContainsKey(id))
+		{
+			_info.Add(id, new Updateable<string>());
+			CardInfoProvider.Get.RequestUpdateFor(this);
+		}
+		return _info[id];
+	}
+	
+	/*private static readonly Dictionary<string, System.Func<CardInfo, string>> DEFAULT_TOKENS = new Dictionary<string, System.Func<CardInfo, string>>(System.StringComparer.OrdinalIgnoreCase)
 	{
 		{ "name", 		c => WWW.EscapeURL(c.Name) },
 		{ "sname", 		c => WWW.EscapeURL(c.Name.SimplifySpecialCharacter().ToLowerInvariant()) },
 		{ "name_ne", 	c => c.Name },
 		{ "sname_ne", 	c => c.Name.SimplifySpecialCharacter().ToLowerInvariant() }
-	};
-	public string GetExtraInfoById(string id)
-	{
-		if (DEFAULT_TOKENS.ContainsKey(id)) {
-			return DEFAULT_TOKENS[id](this);
-		}
-		else 
-		{
-			foreach(var extra in _extras)
-			{
-				var info = extra.GetById(id);
-				if (info != null) return info;
-			}
-		}
-		return null;
-	}
+	};*/
 }
