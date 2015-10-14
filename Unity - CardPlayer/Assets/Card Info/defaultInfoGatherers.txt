@@ -1,16 +1,17 @@
 [
 	{
-		"$type": "JsonCardInfoGatherer, Assembly-CSharp", //must be included for info gatherers
-		"_baseUrl": "https://api.mtgapi.com/v2/cards?name={name}",
+		"$type": "JsonCardInfoGatherer, Assembly-CSharp",
+		"_baseUrl": "https://api.deckbrew.com/mtg/cards?name={name}",
 		"_tokens": {
-			"image_url": "$..gatherer"
+			//"image_url": "$..image_url",
+			"id": "$..multiverse_id"
 		}
 	},
 	{
 		"$type": "JsonCardInfoGatherer, Assembly-CSharp",
-		"_baseUrl": "https://api.deckbrew.com/mtg/cards?name={name}",
+		"_baseUrl": "https://api.mtgapi.com/v2/cards?name={name}",
 		"_tokens": {
-			"image_url": "$..image_url"
+			"image_url": "$..gatherer"
 		}
 	}
 ]

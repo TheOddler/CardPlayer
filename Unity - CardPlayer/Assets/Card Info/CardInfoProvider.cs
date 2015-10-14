@@ -44,27 +44,6 @@ public class CardInfoProvider : MonoBehaviour
 		var autoTypeNameHandling = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto };
 		_infoGatherers = JsonConvert.DeserializeObject<List<CardInfoGatherer>>(_infoGatherersFile.text, autoTypeNameHandling);
 		_imageGatherers = JsonConvert.DeserializeObject<List<CardImageGatherer>>(_imageGatherersFile.text, autoTypeNameHandling);
-		
-		/*var mtgapi = new JsonCardInfoGatherer("https://api.mtgapi.com/v2/cards?name={name}", new Dictionary<string, string>()
-		{
-			{"image_url", "$..gatherer"}
-		});
-		var deckbrew = new JsonCardInfoGatherer("https://api.deckbrew.com/mtg/cards?name={name}", new Dictionary<string, string>()
-		{
-			{"image_url", "$..image_url"}
-		});
-		_infoGatherers.Add(mtgapi);
-		_infoGatherers.Add(deckbrew);
-		
-		var directImage = new CardImageGatherer("{image_url}");
-		_imageGatherers.Add(directImage);
-		
-		string savedInfoGatherers = JsonConvert.SerializeObject(_infoGatherers, Formatting.Indented, autoTypeNameHandling);
-		Debug.Log("Info Gatherers:\n" + savedInfoGatherers);
-		
-		string savedImageGatherers = JsonConvert.SerializeObject(_imageGatherers);
-		Debug.Log("Image Gatherers:\n" + savedImageGatherers);
-		*/
 	}
 
 	//

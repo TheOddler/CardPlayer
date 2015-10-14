@@ -1,5 +1,8 @@
 [
 	{
-		"_baseUrl": "{image_url}"
+		"_baseUrl": "http://crossorigin.me/http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid={id}&type=card"
+	},
+	{
+		"_baseUrl": "http://crossorigin.me/{image_url}"
 	}
 ]
