@@ -29,8 +29,8 @@ sysinfo.txt
 #
 # VS Code
 # ---
-Assets/*/Editor/VSCode.cs
-Assets/*/Editor/VSCode.cs.meta
+Assets/VSCode/*
+Assets/VSCode.meta
 *.vscode
 
 #
