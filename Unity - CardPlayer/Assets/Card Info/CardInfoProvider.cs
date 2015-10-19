@@ -63,6 +63,8 @@ public class CardInfoProvider : MonoBehaviour
 			Material mat = new Material(_frontMaterial); // Copy of the default front material, the actual image will be loaded into this
 			CardInfo card = new CardInfo(name, mat);
 			_knownInfo[name] = card; // Remember this for later
+			
+			StartCoroutine(DownloadImageFor(card));
 		}
 		
 		return _knownInfo[name];
@@ -101,6 +103,11 @@ public class CardInfoProvider : MonoBehaviour
 		}
 	}
 	
+	IEnumerator DownloadImageFor(CardInfo card)
+	{
+		var gatherer = _imageGatherers[0];
+		return gatherer.LoadImageFor(card);
+	}
 	
 	
 	void OnGUI() 

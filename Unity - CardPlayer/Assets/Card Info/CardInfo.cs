@@ -11,7 +11,7 @@ public class CardInfo
 	// ---
 	public CardInfo(string name, Material mat)
 	{
-		_info.Add(NAME_TOKEN, new Updateable<string>(name));
+		_info.Add(NAME_TOKEN, new Updateable<string>(name, true));
 		_material = mat;
 	}
 	
@@ -62,4 +62,9 @@ public class CardInfo
 		{ "name_ne", 	c => c.Name },
 		{ "sname_ne", 	c => c.Name.SimplifySpecialCharacter().ToLowerInvariant() }
 	};*/
+	
+	//
+	// Debugging
+	// ---
+	public Dictionary<string, Updateable<string>> DebugInfo { get { return _info; } }
 }

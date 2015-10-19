@@ -85,4 +85,9 @@ public class Card : NetworkBehaviour, IDragHandler, IPointerClickHandler
 		// Other options that change the rotation
 		transform.localRotation = Quaternion.Euler(0, rotation, 0);
 	}
+	
+	//
+	// Debugging
+	// ---
+	public CardInfo DebugInfo { get { return _info; } }
 }
