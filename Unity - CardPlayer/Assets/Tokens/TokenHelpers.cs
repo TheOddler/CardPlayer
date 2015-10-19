@@ -8,16 +8,17 @@ public static class TokenHelpers
 	
 	public static IEnumerable<Token> GetAllTokensFrom(string text)
 	{
-		return TOKEN_REGEX.Matches(text).Cast<Match>().Select(m => new Token(m.Value));
+		return TOKEN_REGEX.Matches(text).Cast<Match>().Select(m => new Token(m.Groups[1].Value));
 	}
 	
 	public static string FillAllTokensIn(string text, CardInfo info)
 	{
-		return TOKEN_REGEX.Replace(text, match => TranslateToken(match.Groups[1].Value, info));
+		return TOKEN_REGEX.Replace(text, m => TranslateToken(m.Groups[1].Value, info));
 	}
 	
-	public static string TranslateToken(string token, CardInfo info)
+	private static string TranslateToken(string value, CardInfo card)
 	{
-		return info.GetExtraInfoById(token).Value;
+		Token token = new Token(value);
+		return token.GetValueFrom(card);
 	}
 }

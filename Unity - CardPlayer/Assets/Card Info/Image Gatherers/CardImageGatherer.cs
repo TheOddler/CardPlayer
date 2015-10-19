@@ -23,6 +23,7 @@ public class CardImageGatherer
 		{
 			values.Push(card.GetExtraInfoById(token.ID));
 		}
+		// Spin wait TODO make better
 		while(values.Count > 0)
 		{
 			var value = values.Peek();
@@ -30,6 +31,7 @@ public class CardImageGatherer
 			else yield return null;
 		}
 		string url = TokenHelpers.FillAllTokensIn(_baseUrl, card);
+		//Debug.Log("Image url: " + url);
 		
 		using (WWW www = new WWW(url))
 		{

@@ -17,7 +17,11 @@ public class CardInspector : Editor
 		{
 			foreach (var pair in cardInfo.DebugInfo)
 			{
-				GUILayout.Label(pair.Key + ":\t" + pair.Value.Value);
+				GUILayout.BeginHorizontal();
+				GUILayout.Label(pair.Key + ":");
+				GUILayout.FlexibleSpace();
+				GUILayout.TextField(pair.Value.Value);
+				GUILayout.EndHorizontal();
 			}
 		}
 		

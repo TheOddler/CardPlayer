@@ -41,16 +41,16 @@ public class JsonCardInfoGatherer: CardInfoGatherer
 				{
 					JToken info = JToken.Parse(www.text);
 					AddInfoTo(card, info);
-					Debug.Log("Succesfully loaded info for " + card.Name + "\nAdded info: " + info.ToString());
+					//Debug.Log("Succesfully loaded info for " + card.Name + "\nAdded info: " + info.ToString());
 				}
-				catch (System.Exception e)
+				catch (System.Exception /*e*/)
 				{
-					Debug.Log("Failed parsing info as json, with error: " + e.Message + "\nFrom: " + url + "\nGotten text: " + www.text);
+					//Debug.Log("Failed parsing info as json, with error: " + e.Message + "\nFrom: " + url + "\nGotten text: " + www.text);
 				}
 			}
 			else
 			{
-				Debug.Log("Failed to load info for: " + card.Name + "; url: " + url + "; error: " + www.error + "\n" + www.text);
+				//Debug.Log("Failed to load info for: " + card.Name + "; url: " + url + "; error: " + www.error + "\n" + www.text);
 			}
 		}
 	}
