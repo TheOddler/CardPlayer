@@ -2,6 +2,7 @@
 using UnityEngine;
 using IEnumerator = System.Collections.IEnumerator;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 
 [JsonObject(MemberSerialization.OptIn)]
@@ -10,47 +11,41 @@ public class CardImageGatherer
 	[JsonProperty]
 	private string _baseUrl;
 	
+	TokenString _tokenString;
+	
 	public CardImageGatherer(string baseUrl)
 	{
 		_baseUrl = baseUrl;
+		_tokenString = new TokenString(baseUrl);
 	}
 	
-	public IEnumerator LoadImageFor(CardInfo cardInfo/*, System.Action<bool> success*/)
+	public void GatherImageFor(CardInfo cardInfo, System.Action<Texture2D> onFinished)
 	{
-		var tokens = TokenHelpers.GetAllTokensFrom(_baseUrl);
-		Stack<Updateable<string>> values = new Stack<Updateable<string>>();
-		foreach(var token in tokens)
-		{
-			values.Push(cardInfo[token.ID]);
-		}
-		// Spin wait TODO make better
-		while(values.Count > 0)
-		{
-			var value = values.Peek();
-			if (value.Ready) values.Pop();
-			else yield return null;
-		}
-		string url = TokenHelpers.FillAllTokensIn(_baseUrl, cardInfo);
-		//Debug.Log("Image url: " + url);
-		
+		IEnumerable<Token> tokens = _tokenString.GetAllTokens();
+		// Get values. Also use 'to list' to make sure all are asked for now.
+		List<Updateable<string>> values = tokens.Select(t => cardInfo[t.ID]).ToList();
+		// TODO
+		// Wait for values if needed
+		// By subscribing to the non-ready update events
+		// Create url
+		// Start download coroutine
+	}
+	
+	IEnumerator DownloadFrom(string url, System.Action<Texture2D> onFinished)
+	{
 		using (WWW www = new WWW(url))
 		{
 			yield return www;
 			
 			if (www.error == null)
 			{
-				Texture2D texture = new Texture2D(1, 1); //, TextureFormat.DXT1, false);
-				www.LoadImageIntoTexture(texture);
-				cardInfo.Material.mainTexture = texture;
-				//success(true);
+				onFinished(www.texture);
 			}
 			else
 			{
 				//Debug.Log("Failed to load image for " + card.Name + " from " + url + " with error: " + www.error);
-				//success(false);
+				onFinished(null);
 			}
-			
-			www.Dispose();
 		}
 	}
 }

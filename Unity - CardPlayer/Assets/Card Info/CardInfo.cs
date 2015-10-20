@@ -9,10 +9,9 @@ public class CardInfo
 	//
 	// Constructors
 	// ---
-	public CardInfo(string name, Material mat)
+	public CardInfo(string name)
 	{
 		_info.Add(NAME_TOKEN, new Updateable<string>(name, true));
-		_material = mat;
 	}
 	
 	//
@@ -25,7 +24,8 @@ public class CardInfo
 		if (!_info.ContainsKey(id))
 		{
 			_info.Add(id, new Updateable<string>());
-			CardInfoProvider.Get.RequestUpdateFor(this);
+			//TODO Start gathering the required values
+			// start at the end of the frame, in case many are requested at once.
 		}
 		return _info[id];
 	}
@@ -46,10 +46,17 @@ public class CardInfo
 	//
 	// Material
 	// ---
-	private Material _material;
+	private Material _material = null;
 	public Material Material
 	{
-		get { return _material; }
+		get
+		{
+			if (_material == null)
+			{
+				_material = CardInfoProvider.Get.FrontMaterialCopy();
+			}
+			return _material;
+		}
 	}
 	
 	//

@@ -48,10 +48,10 @@ public class CardInfoProvider : MonoBehaviour
 		_imageGatherers = JsonConvert.DeserializeObject<List<CardImageGatherer>>(_imageGatherersFile.text, autoTypeNameHandling);
 	}
 	
-	void Start()
+	/*void Start()
 	{
 		StartCoroutine(GatheringLoop());
-	}
+	}*/
 	
 	//
 	// Getters
@@ -60,20 +60,36 @@ public class CardInfoProvider : MonoBehaviour
 	{
 		if (!_knownInfo.ContainsKey(name))
 		{
-			Material mat = new Material(_frontMaterial); // Copy of the default front material, the actual image will be loaded into this
-			CardInfo card = new CardInfo(name, mat);
-			_knownInfo[name] = card; // Remember this for later
+			//Material mat = new Material(_frontMaterial); // Copy of the default front material, the actual image will be loaded into this
+			//CardInfo card = new CardInfo(name, mat);
+			//_knownInfo[name] = card; // Remember this for later
 			
-			StartCoroutine(DownloadImageFor(card));
+			//StartCoroutine(DownloadImageFor(card));
+			
+			_knownInfo[name] = new CardInfo(name);
 		}
 		
 		return _knownInfo[name];
 	}
 	
+	public Material FrontMaterialCopy()
+	{
+		return new Material(_frontMaterial);
+	}
+	
+	public List<CardInfoGatherer> InfoGatherersCopy()
+	{
+		return new List<CardInfoGatherer>(_infoGatherers);
+	}
+	public List<CardImageGatherer> ImageGatherersCopy()
+	{
+		return new List<CardImageGatherer>(_imageGatherers);
+	}
+	
 	//
 	// Gathering
 	// ---
-	public void RequestUpdateFor(CardInfo card)
+	/*public void RequestUpdateFor(CardInfo card)
 	{
 		if (!_gatheringQueue.Contains(card))
 		{
@@ -107,7 +123,7 @@ public class CardInfoProvider : MonoBehaviour
 	{
 		var gatherer = _imageGatherers[0];
 		return gatherer.LoadImageFor(card);
-	}
+	}*/
 	
 	
 	void OnGUI() 
