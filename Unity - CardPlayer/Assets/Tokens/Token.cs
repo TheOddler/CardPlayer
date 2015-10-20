@@ -21,9 +21,9 @@ public class Token
 		}
 	}
 	
-	public string GetValueFrom(CardInfo card)
+	public string GetValueFrom(CardInfo cardInfo)
 	{
-		string value = card.GetExtraInfoById(_id).Value;
+		string value = cardInfo.GetById(_id).Value;
 		if (_settings != null && _settings.Contains("e"))
 		{
 			value = WWW.EscapeURL(value);

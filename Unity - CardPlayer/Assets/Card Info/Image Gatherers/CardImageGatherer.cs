@@ -15,13 +15,13 @@ public class CardImageGatherer
 		_baseUrl = baseUrl;
 	}
 	
-	public IEnumerator LoadImageFor(CardInfo card/*, System.Action<bool> success*/)
+	public IEnumerator LoadImageFor(CardInfo cardInfo/*, System.Action<bool> success*/)
 	{
 		var tokens = TokenHelpers.GetAllTokensFrom(_baseUrl);
 		Stack<Updateable<string>> values = new Stack<Updateable<string>>();
 		foreach(var token in tokens)
 		{
-			values.Push(card.GetExtraInfoById(token.ID));
+			values.Push(cardInfo[token.ID]);
 		}
 		// Spin wait TODO make better
 		while(values.Count > 0)
@@ -30,7 +30,7 @@ public class CardImageGatherer
 			if (value.Ready) values.Pop();
 			else yield return null;
 		}
-		string url = TokenHelpers.FillAllTokensIn(_baseUrl, card);
+		string url = TokenHelpers.FillAllTokensIn(_baseUrl, cardInfo);
 		//Debug.Log("Image url: " + url);
 		
 		using (WWW www = new WWW(url))
@@ -41,7 +41,7 @@ public class CardImageGatherer
 			{
 				Texture2D texture = new Texture2D(1, 1); //, TextureFormat.DXT1, false);
 				www.LoadImageIntoTexture(texture);
-				card.Material.mainTexture = texture;
+				cardInfo.Material.mainTexture = texture;
 				//success(true);
 			}
 			else

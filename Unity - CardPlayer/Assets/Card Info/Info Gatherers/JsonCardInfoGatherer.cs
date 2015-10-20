@@ -55,14 +55,14 @@ public class JsonCardInfoGatherer: CardInfoGatherer
 		}
 	}
 	
-	void AddInfoTo(CardInfo card, JToken info)
+	void AddInfoTo(CardInfo cardInfo, JToken info)
 	{
 		foreach(var infoPath in _infoPaths)
 		{
 			// get value from json
 			string newValue = info.SelectTokens(infoPath.Value).Last().ToString();
 			// set value in the card
-			card.GetExtraInfoById(infoPath.Key).UpdateValue(newValue);
+			cardInfo[infoPath.Key].UpdateValue(newValue);
 		}
 	}
 }
