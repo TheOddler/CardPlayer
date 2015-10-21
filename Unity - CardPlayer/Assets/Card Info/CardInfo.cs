@@ -8,8 +8,7 @@ public class CardInfo
 	public const string NAME_TOKEN = "name";
 	
 	private bool _gatheringScheduled = false;
-	// TODO: Use counting set
-	HashSet<string> _idsBeingGathered = new HashSet<string>(); //contains all id's that are (potentially) being gathered.
+	MultiMap<string, CardInfoGatherer> _idsBeingGathered = new MultiMap<string, CardInfoGatherer>(); //contains all id's that are (potentially) being gathered, and by who.
 	
 	//
 	// Constructors
@@ -29,7 +28,7 @@ public class CardInfo
 		if (!_info.ContainsKey(id))
 		{
 			_info.Add(id, new Updateable<string>());
-			StartGatheringIfNeeded();
+			StartGatheringIfNonScheduled();
 		}
 		return _info[id];
 	}
@@ -69,7 +68,7 @@ public class CardInfo
 	//
 	// Gathering
 	// ---
-	void StartGatheringIfNeeded()
+	void StartGatheringIfNonScheduled()
 	{
 		if (!_gatheringScheduled)
 		{
@@ -84,21 +83,21 @@ public class CardInfo
 		
 		// TODO remember which gatherers were already used
 		var missingIds = _info.Where(kvp => !kvp.Value.Ready).Select(kvp => kvp.Key);
-		var gatherers = CardInfoProvider.Get.InfoGatherersCopy();
+		var gatherers = CardInfoProvider.Get.InfoGatherersCopy(); //TODO: Remember which I already used, and don't use them again
 		string firstMissing;
-		while ((firstMissing = missingIds.FirstOrDefault(id => !_idsBeingGathered.Contains(id))) != null)
+		while ((firstMissing = missingIds.FirstOrDefault(id => !_idsBeingGathered.ContainsKey(id))) != null)
 		// While there is a missing id that isn't already being gathered
 		{
 			//TODO select best fitting one, rather than first one that fits.
 			var firstGatherer = gatherers.First(g => g.PotentialHits.Contains(firstMissing));
-			_idsBeingGathered.UnionWith(firstGatherer.PotentialHits);
-			firstGatherer.GatherInfoFor(this, OnInfoGathererFinished);
+			_idsBeingGathered.AddValueToKeys(firstGatherer.PotentialHits, firstGatherer);
+			firstGatherer.GatherInfoFor(this, dict => { OnInfoGathererFinished(dict, firstGatherer); });
 		}
 		
 		_gatheringScheduled = false;
 	}
 	
-	void OnInfoGathererFinished(Dictionary<string,string> foundValues)
+	void OnInfoGathererFinished(Dictionary<string,string> foundValues, CardInfoGatherer usedGatherer)
 	{
 		if (foundValues == null)
 		{
@@ -106,13 +105,29 @@ public class CardInfo
 		}
 		else
 		{
-			// TODO Handle duplicate info.
-			// TODO Remove the needed entries from 'idsBeingGathered'
+			_idsBeingGathered.RemoveValueFromKeys(usedGatherer.PotentialHits, usedGatherer);
 			foreach(var kvp in foundValues)
 			{
-				GetById(kvp.Key).UpdateValue(kvp.Value);
+				var value = GetById(kvp.Key);
+				if(value.Ready)
+				{
+					if (value.Value != kvp.Value)
+					{
+						// TODO
+						// What to do?
+						// Update anyway?
+						value.UpdateValue(kvp.Value);
+					}
+					//else everything is fine
+				}
+				else
+				{
+					value.UpdateValue(kvp.Value);
+				}
 			}
 		}
+		
+		StartGatheringIfNonScheduled();
 	}
 	
 	
