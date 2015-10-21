@@ -8,7 +8,8 @@ public class CardInfo
 	public const string NAME_TOKEN = "name";
 	
 	private bool _gatheringScheduled = false;
-	List<string> _missingIds = new List<string>(); //contains all missing id's that aren't being gathered already
+	// TODO: Use counting set
+	HashSet<string> _idsBeingGathered = new HashSet<string>(); //contains all id's that are (potentially) being gathered.
 	
 	//
 	// Constructors
@@ -28,7 +29,6 @@ public class CardInfo
 		if (!_info.ContainsKey(id))
 		{
 			_info.Add(id, new Updateable<string>());
-			_missingIds.Add(id);
 			StartGatheringIfNeeded();
 		}
 		return _info[id];
@@ -83,14 +83,15 @@ public class CardInfo
 		yield return new WaitForEndOfFrame();
 		
 		// TODO remember which gatherers were already used
+		var missingIds = _info.Where(kvp => !kvp.Value.Ready).Select(kvp => kvp.Key);
 		var gatherers = CardInfoProvider.Get.InfoGatherersCopy();
-		while (_missingIds.Count > 0)
+		string firstMissing;
+		while ((firstMissing = missingIds.FirstOrDefault(id => !_idsBeingGathered.Contains(id))) != null)
+		// While there is a missing id that isn't already being gathered
 		{
 			//TODO select best fitting one, rather than first one that fits.
-			string firstWanted = _missingIds[0];
-			var firstGatherer = gatherers.First(g => g.PotentialHits.Contains(firstWanted));
-			_missingIds.RemoveAll(firstGatherer.PotentialHits.Contains);
-			//TODO I assume all 'potential hits' were actual hits.
+			var firstGatherer = gatherers.First(g => g.PotentialHits.Contains(firstMissing));
+			_idsBeingGathered.UnionWith(firstGatherer.PotentialHits);
 			firstGatherer.GatherInfoFor(this, OnInfoGathererFinished);
 		}
 		
@@ -105,7 +106,8 @@ public class CardInfo
 		}
 		else
 		{
-			//TODO I assume all 'potential hits' were actual hits.
+			// TODO Handle duplicate info.
+			// TODO Remove the needed entries from 'idsBeingGathered'
 			foreach(var kvp in foundValues)
 			{
 				GetById(kvp.Key).UpdateValue(kvp.Value);
