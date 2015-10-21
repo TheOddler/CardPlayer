@@ -34,7 +34,6 @@ public class CardInfoProvider : MonoBehaviour
 	public List<CardImageGatherer> DebugImageGatherers { get { return _imageGatherers; } }
 	
 	private Dictionary<string, CardInfo> _knownInfo = new Dictionary<string, CardInfo>();
-	private Queue<CardInfo> _gatheringQueue = new Queue<CardInfo>();
 	
 	//
 	// Init
@@ -49,11 +48,6 @@ public class CardInfoProvider : MonoBehaviour
 		_imageGatherers = JsonConvert.DeserializeObject<List<CardImageGatherer>>(_imageGatherersFile.text, autoTypeNameHandling);
 	}
 	
-	/*void Start()
-	{
-		StartCoroutine(GatheringLoop());
-	}*/
-	
 	//
 	// Getters
 	// ---
@@ -61,12 +55,6 @@ public class CardInfoProvider : MonoBehaviour
 	{
 		if (!_knownInfo.ContainsKey(name))
 		{
-			//Material mat = new Material(_frontMaterial); // Copy of the default front material, the actual image will be loaded into this
-			//CardInfo card = new CardInfo(name, mat);
-			//_knownInfo[name] = card; // Remember this for later
-			
-			//StartCoroutine(DownloadImageFor(card));
-			
 			_knownInfo[name] = new CardInfo(name);
 		}
 		
@@ -87,44 +75,6 @@ public class CardInfoProvider : MonoBehaviour
 		return new List<CardImageGatherer>(_imageGatherers);
 	}
 	
-	//
-	// Gathering
-	// ---
-	/*public void RequestUpdateFor(CardInfo card)
-	{
-		if (!_gatheringQueue.Contains(card))
-		{
-			_gatheringQueue.Enqueue(card);
-		}
-	}
-	
-	IEnumerator GatheringLoop()
-	{
-		yield return new WaitForEndOfFrame();
-		while(true)
-		{
-			if(_gatheringQueue.Count <= 0)
-			{
-				yield return null;
-			}
-			else
-			{
-				var card = _gatheringQueue.Dequeue();
-				
-				// Gather all possible info. TODO: only gather what is really needed
-				foreach (var gatherer in _infoGatherers)
-				{
-					yield return StartCoroutine(gatherer.LoadInfoFor(card));
-				}
-			}
-		}
-	}
-	
-	IEnumerator DownloadImageFor(CardInfo card)
-	{
-		var gatherer = _imageGatherers[0];
-		return gatherer.LoadImageFor(card);
-	}*/
 	
 	
 	void OnGUI() 

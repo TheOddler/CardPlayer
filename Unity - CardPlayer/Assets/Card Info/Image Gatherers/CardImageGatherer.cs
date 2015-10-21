@@ -28,7 +28,7 @@ public class CardImageGatherer
 	
 	public void GatherImageFor(CardInfo cardInfo, System.Action<Texture2D> onFinished)
 	{
-		IEnumerable<Token> tokens = _tokenString.GetAllTokens();
+		IEnumerable<Token> tokens = TokenString.GetAllTokens();
 		// Get values. Also use 'to list' to make sure all are asked for now.
 		List<Updateable<string>> values = tokens.Select(t => cardInfo[t.ID]).ToList();
 		// TODO

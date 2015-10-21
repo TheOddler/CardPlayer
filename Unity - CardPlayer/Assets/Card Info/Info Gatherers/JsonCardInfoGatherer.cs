@@ -41,7 +41,7 @@ public class JsonCardInfoGatherer: CardInfoGatherer
 	public void GatherInfoFor(CardInfo cardInfo, System.Action<Dictionary<string,string>> onFinished)
 	{
 		// I assume all id's are known. So only safe one to use is 'name' at the moment. TODO
-		string url = _tokenString.FillWith(cardInfo);
+		string url = TokenString.FillWith(cardInfo);
 		CardInfoProvider.Get.StartCoroutine(LoadInfoFrom(url, onFinished));
 	}
 	
@@ -59,6 +59,7 @@ public class JsonCardInfoGatherer: CardInfoGatherer
 					var dict = new Dictionary<string,string>(_infoPaths.Count);
 					foreach(var infoPath in _infoPaths)
 					{ // infoPath.Key = id; infoPath.Value = path
+						// TODO: Allow some selects to fail
 						dict[infoPath.Key] = jtoken.SelectTokens(infoPath.Value, true).Last().ToString();
 					}
 					//Debug.Log("Succesfully loaded info for " + card.Name + "\nAdded info: " + info.ToString());
