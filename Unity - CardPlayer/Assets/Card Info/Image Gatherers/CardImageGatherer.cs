@@ -9,14 +9,21 @@ using Newtonsoft.Json;
 public class CardImageGatherer
 {
 	[JsonProperty]
-	private string _baseUrl;
+	string _baseUrl;
 	
 	TokenString _tokenString;
+	public TokenString TokenString
+	{
+		get
+		{
+			if (_tokenString == null) _tokenString = new TokenString(_baseUrl);
+			return _tokenString;
+		}
+	}
 	
 	public CardImageGatherer(string baseUrl)
 	{
 		_baseUrl = baseUrl;
-		_tokenString = new TokenString(baseUrl);
 	}
 	
 	public void GatherImageFor(CardInfo cardInfo, System.Action<Texture2D> onFinished)

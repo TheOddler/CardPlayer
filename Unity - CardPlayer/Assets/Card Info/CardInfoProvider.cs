@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using IEnumerator = System.Collections.IEnumerator;
+//using IEnumerator = System.Collections.IEnumerator;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
@@ -31,6 +31,7 @@ public class CardInfoProvider : MonoBehaviour
 	// ---
 	private List<CardInfoGatherer> _infoGatherers = new List<CardInfoGatherer>();
 	private List<CardImageGatherer> _imageGatherers = new List<CardImageGatherer>();
+	public List<CardImageGatherer> DebugImageGatherers { get { return _imageGatherers; } }
 	
 	private Dictionary<string, CardInfo> _knownInfo = new Dictionary<string, CardInfo>();
 	private Queue<CardInfo> _gatheringQueue = new Queue<CardInfo>();

@@ -54,10 +54,13 @@ public class CardInfo
 			if (_material == null)
 			{
 				_material = CardInfoProvider.Get.FrontMaterialCopy();
+				// TODO Start loading image
 			}
 			return _material;
 		}
 	}
+	
+	
 	
 	//
 	// Convenience functions
@@ -69,8 +72,6 @@ public class CardInfo
 			return _info[NAME_TOKEN].Value;
 		}
 	}
-	
-	
 	
 	//
 	// Debugging

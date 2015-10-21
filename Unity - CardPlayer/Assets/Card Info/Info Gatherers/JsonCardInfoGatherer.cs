@@ -11,8 +11,18 @@ public class JsonCardInfoGatherer: CardInfoGatherer
 	[JsonProperty]
 	private string _baseUrl;
 	
+	TokenString _tokenString;
+	public TokenString TokenString
+	{
+		get
+		{
+			if (_tokenString == null) _tokenString = new TokenString(_baseUrl);
+			return _tokenString;
+		}
+	}
+	
 	[JsonProperty]
-	private Dictionary<string, string> _infoPaths;
+	private Dictionary<string, string> _infoPaths; // id - path
 	
 	public JsonCardInfoGatherer(string baseUrl, Dictionary<string, string> infoPaths)
 	{
@@ -27,42 +37,44 @@ public class JsonCardInfoGatherer: CardInfoGatherer
 			return _infoPaths.Keys;
 		}
 	}
-
-	public IEnumerator LoadInfoFor(CardInfo card)
+	
+	public void GatherInfoFor(CardInfo cardInfo, System.Action<Dictionary<string,string>> onFinished)
 	{
-		string url = TokenHelpers.FillAllTokensIn(_baseUrl, card);
+		// I assume all id's are known. So only safe one to use is 'name' at the moment. TODO
+		string url = _tokenString.FillWith(cardInfo);
+		CardInfoProvider.Get.StartCoroutine(LoadInfoFrom(url, onFinished));
+	}
+	
+	IEnumerator LoadInfoFrom(string url, System.Action<Dictionary<string,string>> onFinished)
+	{
 		using (WWW www = new WWW(url))
 		{
 			yield return www;
-			
 			if (www.error == null)
 			{
 				try
 				{
-					JToken info = JToken.Parse(www.text);
-					AddInfoTo(card, info);
+					JToken jtoken = JToken.Parse(www.text);
+					// Find all id-value pairs in the jtoken based on the _infoPaths.
+					var dict = new Dictionary<string,string>(_infoPaths.Count);
+					foreach(var infoPath in _infoPaths)
+					{ // infoPath.Key = id; infoPath.Value = path
+						dict[infoPath.Key] = jtoken.SelectTokens(infoPath.Value, true).Last().ToString();
+					}
 					//Debug.Log("Succesfully loaded info for " + card.Name + "\nAdded info: " + info.ToString());
+					onFinished(dict);
 				}
 				catch (System.Exception /*e*/)
 				{
 					//Debug.Log("Failed parsing info as json, with error: " + e.Message + "\nFrom: " + url + "\nGotten text: " + www.text);
+					onFinished(null);
 				}
 			}
 			else
 			{
 				//Debug.Log("Failed to load info for: " + card.Name + "; url: " + url + "; error: " + www.error + "\n" + www.text);
+				onFinished(null);
 			}
-		}
-	}
-	
-	void AddInfoTo(CardInfo cardInfo, JToken info)
-	{
-		foreach(var infoPath in _infoPaths)
-		{
-			// get value from json
-			string newValue = info.SelectTokens(infoPath.Value).Last().ToString();
-			// set value in the card
-			cardInfo[infoPath.Key].UpdateValue(newValue);
 		}
 	}
 }
