@@ -53,7 +53,7 @@ public class CardInfo
 			{
 				_material = CardInfoProvider.Get.FrontMaterialCopy();
 				// TODO Don't just use the first one...
-				CardInfoProvider.Get.ImageGatherersCopy().First().GatherImageFor(this, OnImageGathered);
+				CardInfoProvider.Get.ImageGatherersCopy().First().GatherFor(this, OnImageGathered);
 			}
 			return _material;
 		}
@@ -91,7 +91,7 @@ public class CardInfo
 			//TODO select best fitting one, rather than first one that fits.
 			var firstGatherer = gatherers.First(g => g.PotentialHits.Contains(firstMissing));
 			_idsBeingGathered.AddValueToKeys(firstGatherer.PotentialHits, firstGatherer);
-			firstGatherer.GatherInfoFor(this, dict => { OnInfoGathererFinished(dict, firstGatherer); });
+			firstGatherer.GatherFor(this, dict => { OnInfoGathererFinished(dict, firstGatherer); });
 		}
 		
 		_gatheringScheduled = false;

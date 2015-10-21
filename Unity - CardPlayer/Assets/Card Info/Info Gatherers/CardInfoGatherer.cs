@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 
-public interface CardInfoGatherer
+public abstract class CardInfoGatherer: WWWGatherer<Dictionary<string,string>>
 {
-	ICollection<string> PotentialHits { get; }
+	public CardInfoGatherer(string baseUrl) : base(baseUrl) { }
 	
-	void GatherInfoFor(CardInfo cardInfo, System.Action<Dictionary<string,string>> onFinished);
+	abstract public ICollection<string> PotentialHits { get; }
 }
