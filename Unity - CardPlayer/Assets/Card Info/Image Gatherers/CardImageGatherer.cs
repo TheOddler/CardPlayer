@@ -1,4 +1,4 @@
-﻿
+﻿using System;
 using UnityEngine;
 using IEnumerator = System.Collections.IEnumerator;
 using System.Collections.Generic;
@@ -31,11 +31,26 @@ public class CardImageGatherer
 		IEnumerable<Token> tokens = TokenString.GetAllTokens();
 		// Get values. Also use 'to list' to make sure all are asked for now.
 		List<Updateable<string>> values = tokens.Select(t => cardInfo[t.ID]).ToList();
-		// TODO
-		// Wait for values if needed
-		// By subscribing to the non-ready update events
-		// Create url
-		// Start download coroutine
+		// See if there are still values I need to wait for
+		var waitFor = values.FirstOrDefault(t => !t.Ready);
+		if (waitFor != null)
+		{
+			// When the value I was waiting for is updated, call this method again.
+			// Make sure to remove the onUpdated method again when UpdatedTo is called
+			Action<string> onUpdated = null;
+			onUpdated = (v) => 
+			{
+				waitFor.UpdatedTo -= onUpdated;
+				GatherImageFor(cardInfo, onFinished);
+			};
+			waitFor.UpdatedTo += onUpdated;
+		}
+		else 
+		{
+			// All values are ready, start the downloading of texture.
+			string url = TokenString.FillWith(cardInfo);
+			CardInfoProvider.Get.StartCoroutine(DownloadFrom(url, onFinished));
+		}
 	}
 	
 	IEnumerator DownloadFrom(string url, System.Action<Texture2D> onFinished)
