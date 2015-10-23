@@ -88,16 +88,15 @@ public class CardInfo
 		
 		var missingIds = _info.Where(kvp => !kvp.Value.Ready).Select(kvp => kvp.Key);
 		//Debug.Log("Mising ids for " + Name + " are: " + string.Join(", ", missingIds.ToArray()));
-		while (true)
+		CardInfoGatherer gatherer;
+		while ( (gatherer = FindBestUnusedGathererFor(missingIds)) != null )
 		// While there is a missing id that isn't already being gathered
 		{
 			// Capture gatherer in the loop, so it can be used in the lamba (1)
-			var gatherer = FindBestUnusedGathererFor(missingIds);
-			if (gatherer == null) break;
-			_unusedGatherers.Remove(gatherer);
-			_busyGatherers.Add(gatherer);
 			var captured = gatherer;
-			gatherer.GatherFor(this, dict => { OnInfoGathererFinished(dict, captured); }); //(1)
+			_unusedGatherers.Remove(captured);
+			_busyGatherers.Add(captured);
+			captured.GatherFor(this, dict => { OnInfoGathererFinished(dict, captured); }); //(1)
 			//Debug.Log("Sending out a gatherer for " + Name + ": " + gatherer);
 		}
 		
