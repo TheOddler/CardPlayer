@@ -23,6 +23,12 @@ public class CardInspector : Editor
 				GUILayout.TextField(pair.Value.Value);
 				GUILayout.EndHorizontal();
 			}
+			
+			GUILayout.Label("Busy Info Gatherers: ");
+			foreach (var gatherer in cardInfo.DebugBusyGatherers)
+			{
+				GUILayout.Label("Gatherer: " + gatherer.TokenString.ToString());
+			}
 		}
 		
 		if (GUI.changed)

@@ -1,32 +1,56 @@
 using UnityEngine;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
+using System.Linq;
 
 public class Token
 {
+	const string PATTERN = @"\{(?:\s*(\w+)\s*)+\}";
+	public static readonly Regex REGEX = new Regex(PATTERN);
+	
 	private string _id;
 	public string ID { get { return _id; } }
 	
-	private string _settings;
+	private List<string> _settings = new List<string>();
 	
-	public Token(string token)
+	public Token(Match regexMatch)
 	{
-		if (token.Contains(":"))
+		// Group 0 is everything, group 1 is everything between the {}, the captures are the individual words
+		List<Capture> captures = regexMatch.Groups[1].Captures.Cast<Capture>().ToList();
+		// all but the last word are settings
+		int settingsCount = captures.Count - 1;
+		for(int i = 0; i < settingsCount; ++i)
 		{
-			int separator = token.IndexOf(":");
-			_settings = token.Substring(0, separator).Trim();
-			_id = token.Substring(separator+1).Trim();
+			_settings.Add(captures[i].Value.ToLowerInvariant());
 		}
-		else
-		{
-			_id = token.Trim();
-		}
+		// the id is the last word
+		_id = captures[captures.Count - 1].Value;
 	}
 	
 	public string GetValueFrom(CardInfo cardInfo)
 	{
 		string value = cardInfo.GetById(_id).Value;
-		if (_settings != null && _settings.Contains("e"))
+		foreach(var setting in _settings)
 		{
-			value = WWW.EscapeURL(value);
+			switch (setting)
+			{
+				case "urlescaped":
+				case "escaped":
+				case "e":
+					value = WWW.EscapeURL(value);
+					break;
+				case "lower":
+				case "l":
+					value = value.ToLowerInvariant();
+					break;
+				case "upper":
+				case "u":
+					value = value.ToUpperInvariant();
+					break;
+				default:
+					Debug.Log("Unknown setting: " + setting);
+					break;
+			}
 		}
 		
 		return value;

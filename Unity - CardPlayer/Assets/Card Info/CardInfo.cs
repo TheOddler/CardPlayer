@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using IEnumerator = System.Collections.IEnumerator;
 using System.Linq;
+using UnityEngine.Assertions;
 
 public class CardInfo
 {
 	public const string NAME_TOKEN = "name";
 	
 	private bool _gatheringScheduled = false;
-	MultiMap<string, CardInfoGatherer> _idsBeingGathered = new MultiMap<string, CardInfoGatherer>(); //contains all id's that are (potentially) being gathered, and by who.
+	List<CardInfoGatherer> _unusedGatherers;
+	HashSet<CardInfoGatherer> _busyGatherers = new HashSet<CardInfoGatherer>();
 	
 	//
 	// Constructors
@@ -16,6 +18,8 @@ public class CardInfo
 	public CardInfo(string name)
 	{
 		_info.Add(NAME_TOKEN, new Updateable<string>(name, true));
+		
+		_unusedGatherers = CardInfoProvider.Get.InfoGatherersCopy();
 	}
 	
 	//
@@ -78,34 +82,61 @@ public class CardInfo
 	}
 	IEnumerator DoGathering()
 	{
+		//Debug.Log("Scheduled gathering for: " + Name);
 		_gatheringScheduled = true;
 		yield return new WaitForEndOfFrame();
 		
-		// TODO remember which gatherers were already used
 		var missingIds = _info.Where(kvp => !kvp.Value.Ready).Select(kvp => kvp.Key);
-		var gatherers = CardInfoProvider.Get.InfoGatherersCopy(); //TODO: Remember which I already used, and don't use them again
-		string firstMissing;
-		while ((firstMissing = missingIds.FirstOrDefault(id => !_idsBeingGathered.ContainsKey(id))) != null)
+		//Debug.Log("Mising ids for " + Name + " are: " + string.Join(", ", missingIds.ToArray()));
+		while (true)
 		// While there is a missing id that isn't already being gathered
 		{
-			//TODO select best fitting one, rather than first one that fits.
-			var firstGatherer = gatherers.First(g => g.PotentialHits.Contains(firstMissing));
-			_idsBeingGathered.AddValueToKeys(firstGatherer.PotentialHits, firstGatherer);
-			firstGatherer.GatherFor(this, dict => { OnInfoGathererFinished(dict, firstGatherer); });
+			// Capture gatherer in the loop, so it can be used in the lamba (1)
+			var gatherer = FindBestUnusedGathererFor(missingIds);
+			if (gatherer == null) break;
+			_unusedGatherers.Remove(gatherer);
+			_busyGatherers.Add(gatherer);
+			var captured = gatherer;
+			gatherer.GatherFor(this, dict => { OnInfoGathererFinished(dict, captured); }); //(1)
+			//Debug.Log("Sending out a gatherer for " + Name + ": " + gatherer);
 		}
 		
 		_gatheringScheduled = false;
+		//Debug.Log("Finished sending out gatherers for: " + Name);
+	}
+	CardInfoGatherer FindBestUnusedGathererFor(IEnumerable<string> missingIds)
+	{
+		if (_unusedGatherers.Count <= 0)
+		{
+			return null;
+		}
+		
+		// The one to gather is the first that isn't already being gathered
+		string toGather = missingIds.FirstOrDefault(id => !_busyGatherers.Any(g => g.PotentialHits.Contains(id)));
+		if (toGather != null)
+		{
+			// Find a gatherer to use, currently simply the first one fr this id
+			var gatherer = _unusedGatherers.FirstOrDefault(g => g.PotentialHits.Contains(toGather));
+			// Since I check for an id that isn't being gathered, the chosen gatherer can't be busy already
+			Assert.IsFalse(_busyGatherers.Contains(gatherer));
+			
+			return gatherer;
+		}
+		else 
+		{
+			return null;
+		}
+		// TODO: Rewrite so the gatherer with most potential hits is used first
 	}
 	
 	void OnInfoGathererFinished(Dictionary<string,string> foundValues, CardInfoGatherer usedGatherer)
 	{
 		if (foundValues == null)
 		{
-			Debug.Log("Info gathering failed for: " + Name);
+			Debug.Log("Info gathering failed for " + Name + " by: " + usedGatherer);
 		}
 		else
 		{
-			_idsBeingGathered.RemoveValueFromKeys(usedGatherer.PotentialHits, usedGatherer);
 			foreach(var kvp in foundValues)
 			{
 				var value = GetById(kvp.Key);
@@ -127,6 +158,9 @@ public class CardInfo
 			}
 		}
 		
+		_busyGatherers.Remove(usedGatherer); 
+		
+		// check if any more gathering is needed.
 		StartGatheringIfNonScheduled();
 	}
 	
@@ -146,4 +180,5 @@ public class CardInfo
 	// Debugging
 	// ---
 	public Dictionary<string, Updateable<string>> DebugInfo { get { return _info; } }
+	public HashSet<CardInfoGatherer> DebugBusyGatherers { get { return _busyGatherers; } }
 }

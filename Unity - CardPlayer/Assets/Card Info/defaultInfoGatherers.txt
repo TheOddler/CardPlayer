@@ -1,7 +1,7 @@
 [
 	{
 		"$type": "JsonCardInfoGatherer, Assembly-CSharp",
-		"_baseUrl": "https://api.deckbrew.com/mtg/cards?name={e:name}",
+		"_baseUrl": "https://api.deckbrew.com/mtg/cards?name={escaped name}",
 		"_infoPaths": {
 			"image_url": "$..image_url",
 			"id": "$..multiverse_id"
@@ -9,7 +9,7 @@
 	},
 	{
 		"$type": "JsonCardInfoGatherer, Assembly-CSharp",
-		"_baseUrl": "https://api.mtgapi.com/v2/cards?name={e:name}",
+		"_baseUrl": "https://api.mtgapi.com/v2/cards?name={escaped name}",
 		"_infoPaths": {
 			"image_url": "$..gatherer"
 		}
