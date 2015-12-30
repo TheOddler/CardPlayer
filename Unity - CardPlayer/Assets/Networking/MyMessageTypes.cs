@@ -1,5 +1,6 @@
 ﻿using UnityEngine.Networking;
 
-public class MyMsgType {
+public static class MyMessageTypes
+{
 	public static short Command = MsgType.Highest + 1;
 };

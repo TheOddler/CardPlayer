@@ -1,5 +1,7 @@
 using UnityEngine;
+using Newtonsoft.Json;
 
+[JsonObject(MemberSerialization.Fields)]
 public class DebugMessageCommand : Command
 {
 	private string _message;
@@ -12,5 +14,10 @@ public class DebugMessageCommand : Command
 	public void Do()
 	{
 		Debug.Log("<< Debug: " + _message + " >>");
+	}
+
+	public override string ToString()
+	{
+		return "[DebugMessageCommand: " + _message + "]";
 	}
 }

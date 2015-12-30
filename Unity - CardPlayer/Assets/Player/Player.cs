@@ -15,7 +15,7 @@ public class Player : NetworkBehaviour
 	{
 		if (!isLocalPlayer) return;
 
-		if (Input.GetKeyDown(KeyCode.Space))
+		/*if (Input.GetKeyDown(KeyCode.Space))
 		{
 			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 			RaycastHit hit;
@@ -23,17 +23,33 @@ public class Player : NetworkBehaviour
 			{
 				CmdSpawnCard("Ponder", hit.point);
 			}
+		}*/
+		if (Input.GetKeyDown(KeyCode.D))
+		{
+			NetworkCommander.Get.SendCommand(new DebugCommand());
+		}
+		if (Input.GetKeyDown(KeyCode.Q))
+		{
+			NetworkCommander.Get.SendCommand(new DebugMessageCommand("QQQ"));
+		}
+		if (Input.GetKeyDown(KeyCode.W))
+		{
+			NetworkCommander.Get.SendCommand(new DebugMessageCommand("\\_/\\_/"));
+		}
+		if (Input.GetKeyDown(KeyCode.E))
+		{
+			NetworkCommander.Get.SendCommand(new DebugMessageCommand("USE!"));
 		}
 	}
 
-	[Command]
+	/*[Command]
 	void CmdSpawnCard(string name, Vector3 position)
 	{
 		Card card = Instantiate(_cardPrefab);
 		card.transform.position = position;
 		card.Name = name;
 		NetworkServer.SpawnWithClientAuthority(card.gameObject, gameObject);
-	}
+	}*/
 		
 	void OnGUI()
 	{
