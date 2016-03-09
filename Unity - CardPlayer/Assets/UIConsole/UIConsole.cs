@@ -9,6 +9,10 @@ public class UIConsole : MonoBehaviour
 	void Awake()
 	{
 		_logText = GetComponent<Text>();
+		if (_logText.raycastTarget)
+		{
+			Debug.Log("Console is clickable, click won't go through to other object!");
+		}
 	}
 
 	void OnEnable()

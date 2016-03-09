@@ -4,10 +4,8 @@ using UnityEngine.EventSystems;
 using UnityEngine.Assertions;
 
 [RequireComponent(typeof(Renderer))]
-public class Card : NetworkBehaviour, IDragHandler, IPointerClickHandler
+public class Card : NetworkBehaviour, IDragHandler
 {
-	const float TAP_ANGLE = 45f;
-
 	//
 	// Info
 	// ---
@@ -21,22 +19,6 @@ public class Card : NetworkBehaviour, IDragHandler, IPointerClickHandler
 	}
 
 	private CardInfo _info;
-
-	//
-	// Mechanics
-	// ---
-	[SyncVar(hook = "SetTapped")]
-	public bool _tapped;
-	public void SetTapped(bool tapped) // no property so it works with unet.
-	{
-		_tapped = tapped;
-		UpdateRotation();
-	}
-	[Command]
-	void CmdSetTapped(bool tapped)
-	{
-		SetTapped(tapped);
-	}
 
 	//
 	// Initialization
@@ -55,17 +37,6 @@ public class Card : NetworkBehaviour, IDragHandler, IPointerClickHandler
 		//Debug.Log("Hey");
 	}
 
-	public void OnPointerClick(PointerEventData eventData)
-	{
-		if (eventData.clickCount % 2 == 0)
-		{
-			if (hasAuthority)
-			{
-				CmdSetTapped(!_tapped);
-			}
-		}
-	}
-
 	//
 	// Visuals
 	// ---
@@ -73,17 +44,6 @@ public class Card : NetworkBehaviour, IDragHandler, IPointerClickHandler
 	{
 		Assert.IsNotNull(_info);
 		GetComponent<Renderer>().material = _info.Material;
-	}
-
-	private void UpdateRotation()
-	{
-		float rotation = 0f;
-		if (_tapped)
-		{
-			rotation += TAP_ANGLE;
-		}
-		// Other options that change the rotation
-		transform.localRotation = Quaternion.Euler(0, rotation, 0);
 	}
 	
 	//

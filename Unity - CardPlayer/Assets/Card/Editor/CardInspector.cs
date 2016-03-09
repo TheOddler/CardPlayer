@@ -20,7 +20,7 @@ public class CardInspector : Editor
 				GUILayout.BeginHorizontal();
 				GUILayout.Label(pair.Key + ":");
 				GUILayout.FlexibleSpace();
-				GUILayout.TextField(pair.Value.Value);
+				GUILayout.TextField(pair.Value.Ready ? pair.Value.Value : "--Not Ready Yet (Reselect to refresh)--");
 				GUILayout.EndHorizontal();
 			}
 			

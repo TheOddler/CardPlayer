@@ -1,6 +1,13 @@
 [
 	{
 		"$type": "JsonCardInfoGatherer, Assembly-CSharp",
+		"_baseUrl": "https://api.magicthegathering.io/v1/cards?name={escaped name}",
+		"_infoPaths": {
+			"image_url": "$..imageUrl"
+		}
+	},
+	{
+		"$type": "JsonCardInfoGatherer, Assembly-CSharp",
 		"_baseUrl": "https://api.deckbrew.com/mtg/cards?name={escaped name}",
 		"_infoPaths": {
 			"image_url": "$..image_url",

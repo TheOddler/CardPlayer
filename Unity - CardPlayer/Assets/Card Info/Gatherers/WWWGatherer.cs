@@ -63,4 +63,9 @@ public abstract class WWWGatherer<T>
 	}
 	
 	abstract protected void HandleFinished(WWW www, System.Action<T> onFinished);
+
+	public override string ToString()
+	{
+		return base.ToString() + "(" + _baseUrl +")";
+	}
 }

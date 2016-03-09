@@ -40,9 +40,9 @@ public class JsonCardInfoGatherer: CardInfoGatherer
 				//Debug.Log("Succesfully loaded info for " + card.Name + "\nAdded info: " + info.ToString());
 				onFinished(dict);
 			}
-			catch (System.Exception /*e*/)
+			catch (System.Exception) //e)
 			{
-				//Debug.Log("Failed parsing info as json, with error: " + e.Message + "\nFrom: " + url + "\nGotten text: " + www.text);
+				//Debug.Log("Failed parsing info as json, with error: " + e.Message + "\nFrom: " + www.url + "\nGotten text: " + www.text);
 				onFinished(null);
 			}
 		}

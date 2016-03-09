@@ -14,6 +14,7 @@ GameObject:
   - 114: {fileID: 11481148}
   - 114: {fileID: 11467616}
   - 54: {fileID: 5431138}
+  - 114: {fileID: 11427130}
   m_Layer: 0
   m_Name: Card
   m_TagString: Untagged
@@ -156,6 +157,18 @@ MeshCollider:
   serializedVersion: 2
   m_Convex: 1
   m_Mesh: {fileID: 4300000, guid: 55b499603dcf8ae4d817edd35523c6b1, type: 3}
+--- !u!114 &11427130
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 115284}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75cfa7d7e99b10f43bf5742aa3a3dd2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _tapped: 0
 --- !u!114 &11467616
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -168,7 +181,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _name: Nicol Bolas, Planeswalker
-  _tapped: 0
 --- !u!114 &11481148
 MonoBehaviour:
   m_ObjectHideFlags: 1
