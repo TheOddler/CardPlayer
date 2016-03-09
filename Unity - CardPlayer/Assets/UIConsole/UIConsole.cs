@@ -4,11 +4,11 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Text))]
 public class UIConsole : MonoBehaviour
 {
+	[SerializeField]
 	private Text _logText;
 
 	void Awake()
 	{
-		_logText = GetComponent<Text>();
 		if (_logText.raycastTarget)
 		{
 			Debug.Log("Console is clickable, click won't go through to other object!");
