@@ -35,10 +35,13 @@ public class Token
 			switch (setting)
 			{
 				case "urlescaped":
-				case "escaped":
-				case "e":
+				case "ue":
 					value = WWW.EscapeURL(value);
 					break;
+				case "quoteescaped":
+				case "qe":
+					value = value.Replace(@"""", @"\""").Replace("'", @"\'");
+				break;
 				case "lower":
 				case "l":
 					value = value.ToLowerInvariant();
