@@ -11,7 +11,7 @@ public class TokenString
 		_text = text;
 	}
 	
-	public string FillWith(CardInfo info)
+	public string GetFilledWith(CardInfo info)
 	{
 		return TokenHelpers.FillAllTokensIn(_text, info);
 	}

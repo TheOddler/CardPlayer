@@ -6,7 +6,7 @@ public class CardImageGatherer: WWWGatherer<Texture2D>
 {
 	public CardImageGatherer(string baseUrl) : base(baseUrl) { }
 	
-	override protected void HandleFinished(WWW www, System.Action<Texture2D> onFinished)
+	override protected void HandleFinished(WWW www, CardInfo cardInfo, System.Action<Texture2D> onFinished)
 	{
 		if (www.error == null)
 		{

@@ -134,6 +134,10 @@ public class CardInfo
 		{
 			Debug.Log("Info gathering failed for " + Name + " by: " + usedGatherer);
 		}
+		else if (foundValues.Count == 0)
+		{
+			Debug.Log("Info gathering succeeded but returned nothing for " + Name + " by: " + usedGatherer);
+		}
 		else
 		{
 			foreach(var kvp in foundValues)

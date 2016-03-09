@@ -7,18 +7,18 @@ using System.Linq;
 [JsonObject(MemberSerialization.OptIn)]
 public class JsonCardInfoGatherer: CardInfoGatherer
 {
-	private Dictionary<string, string> _infoPaths; // id - path
+	private Dictionary<string, TokenString> _infoPaths; // id - path
 	[JsonProperty]
-	private Dictionary<string, string> InfoPaths
+	private Dictionary<string, string> InfoPaths //also for serialization
 	{
-		get { return _infoPaths; }
-		set { _infoPaths = value; }
+		get { return _infoPaths.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Text); }
+		set { _infoPaths = value.ToDictionary(kvp => kvp.Key, kvp => new TokenString(kvp.Value)); }
 	}
 
 
 	public JsonCardInfoGatherer(string baseUrl, Dictionary<string, string> infoPaths) : base(baseUrl)
 	{
-		_infoPaths = infoPaths;
+		InfoPaths = infoPaths;
 	}
 	
 	override public ICollection<string> PotentialHits
@@ -28,8 +28,13 @@ public class JsonCardInfoGatherer: CardInfoGatherer
 			return _infoPaths.Keys;
 		}
 	}
-	
-	override protected void HandleFinished(WWW www, System.Action<Dictionary<string,string>> onFinished)
+
+	override protected IEnumerable<Token> GetRequiredTokens()
+	{
+		return base.GetRequiredTokens().Concat(_infoPaths.SelectMany(kvp => kvp.Value.GetAllTokens())).Distinct();
+	}
+
+	override protected void HandleFinished(WWW www, CardInfo cardInfo, System.Action<Dictionary<string,string>> onFinished)
 	{
 		if (www.error == null)
 		{
@@ -41,7 +46,9 @@ public class JsonCardInfoGatherer: CardInfoGatherer
 				foreach(var infoPath in _infoPaths)
 				{
 					// infoPath.Key = id; infoPath.Value = path
-					var foundTokens = jtoken.SelectTokens(infoPath.Value, true);
+					string filledPath = infoPath.Value.GetFilledWith(cardInfo);
+					Debug.Log(filledPath);
+					var foundTokens = jtoken.SelectTokens(filledPath, true);
 					if (foundTokens.Any())
 					{
 						string selected = foundTokens.Last().ToString();
@@ -51,9 +58,9 @@ public class JsonCardInfoGatherer: CardInfoGatherer
 				//Debug.Log("Succesfully loaded info from " + www.url + "\nText: " + www.text);
 				onFinished(dict);
 			}
-			catch (System.Exception) //e)
+			catch (System.Exception e)
 			{
-				//Debug.Log("Failed parsing info as json, with error: " + e.Message + "\nFrom: " + www.url + "\nGotten text: " + www.text);
+				Debug.Log("Failed parsing info as json, with error: " + e.Message + "\nFrom: " + www.url + "\nGotten text: " + www.text);
 				onFinished(null);
 			}
 		}
