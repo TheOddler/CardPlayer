@@ -47,7 +47,6 @@ public class JsonCardInfoGatherer: CardInfoGatherer
 				{
 					// infoPath.Key = id; infoPath.Value = path
 					string filledPath = infoPath.Value.GetFilledWith(cardInfo);
-					Debug.Log(filledPath);
 					var foundTokens = jtoken.SelectTokens(filledPath, true);
 					if (foundTokens.Any())
 					{
