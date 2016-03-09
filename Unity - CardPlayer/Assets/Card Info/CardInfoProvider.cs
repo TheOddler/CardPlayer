@@ -45,8 +45,7 @@ public class CardInfoProvider : MonoBehaviour
 		
 		var autoTypeNameHandling = new JsonSerializerSettings
 		{
-			TypeNameHandling = TypeNameHandling.Auto,
-			Converters = new List<JsonConverter>() { new TokenStringConverter() }
+			TypeNameHandling = TypeNameHandling.Auto
 		};
 		_infoGatherers = JsonConvert.DeserializeObject<List<CardInfoGatherer>>(_infoGatherersFile.text, autoTypeNameHandling);
 		_imageGatherers = JsonConvert.DeserializeObject<List<CardImageGatherer>>(_imageGatherersFile.text, autoTypeNameHandling);
