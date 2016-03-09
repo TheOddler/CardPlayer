@@ -50,7 +50,7 @@ public class JsonCardInfoGatherer: CardInfoGatherer
 					var foundTokens = jtoken.SelectTokens(filledPath, true);
 					if (foundTokens.Any())
 					{
-						string selected = foundTokens.Last().ToString();
+						string selected = foundTokens.Last().ToString(); //last because that's generally the newest card
 						dict[infoPath.Key] = selected;
 					}
 				}
