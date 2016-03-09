@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-[JsonObject(MemberSerialization.Fields)]
 public class TokenString
 {
-	string _text;
+	private string _text;
+	public string Text { get { return _text; } }
 	
 	public TokenString(string text)
 	{

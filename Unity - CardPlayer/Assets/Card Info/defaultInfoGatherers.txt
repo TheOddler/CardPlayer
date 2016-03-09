@@ -1,23 +1,23 @@
 [
 	{
 		"$type": "JsonCardInfoGatherer, Assembly-CSharp",
-		"_baseUrl": "https://api.magicthegathering.io/v1/cards?name={escaped name}",
-		"_infoPaths": {
-			"image_url": "$..imageUrl"
+		"Url": "https://api.magicthegathering.io/v1/cards?name={escaped name}",
+		"InfoPaths": {
+			"image_url": "$..cards[?(@.name={name})].imageUrl"
 		}
 	},
 	{
 		"$type": "JsonCardInfoGatherer, Assembly-CSharp",
-		"_baseUrl": "https://api.deckbrew.com/mtg/cards?name={escaped name}",
-		"_infoPaths": {
+		"Url": "https://api.deckbrew.com/mtg/cards?name={escaped name}",
+		"InfoPaths": {
 			"image_url": "$..image_url",
 			"id": "$..multiverse_id"
 		}
 	},
 	{
 		"$type": "JsonCardInfoGatherer, Assembly-CSharp",
-		"_baseUrl": "https://api.mtgapi.com/v2/cards?name={escaped name}",
-		"_infoPaths": {
+		"Url": "https://api.mtgapi.com/v2/cards?name={escaped name}",
+		"InfoPaths": {
 			"image_url": "$..gatherer"
 		}
 	}

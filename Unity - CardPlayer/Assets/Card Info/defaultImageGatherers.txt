@@ -1,8 +1,11 @@
 [
 	{
-		"_baseUrl": "http://crossorigin.me/{image_url}"
+		"Url": "{image_url}"
 	},
 	{
-		"_baseUrl": "http://crossorigin.me/http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid={id}&type=card"
+		"Url": "http://crossorigin.me/{image_url}"
+	},
+	{
+		"Url": "http://crossorigin.me/http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid={id}&type=card"
 	}
 ]

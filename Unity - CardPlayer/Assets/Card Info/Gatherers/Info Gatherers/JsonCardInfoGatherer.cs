@@ -7,9 +7,15 @@ using System.Linq;
 [JsonObject(MemberSerialization.OptIn)]
 public class JsonCardInfoGatherer: CardInfoGatherer
 {
-	[JsonProperty]
 	private Dictionary<string, string> _infoPaths; // id - path
-	
+	[JsonProperty]
+	private Dictionary<string, string> InfoPaths
+	{
+		get { return _infoPaths; }
+		set { _infoPaths = value; }
+	}
+
+
 	public JsonCardInfoGatherer(string baseUrl, Dictionary<string, string> infoPaths) : base(baseUrl)
 	{
 		_infoPaths = infoPaths;
@@ -33,11 +39,16 @@ public class JsonCardInfoGatherer: CardInfoGatherer
 				// Find all id-value pairs in the jtoken based on the _infoPaths.
 				var dict = new Dictionary<string,string>(_infoPaths.Count);
 				foreach(var infoPath in _infoPaths)
-				{ // infoPath.Key = id; infoPath.Value = path
-					// TODO: Allow some selects to fail
-					dict[infoPath.Key] = jtoken.SelectTokens(infoPath.Value, true).Last().ToString();
+				{
+					// infoPath.Key = id; infoPath.Value = path
+					var foundTokens = jtoken.SelectTokens(infoPath.Value, true);
+					if (foundTokens.Any())
+					{
+						string selected = foundTokens.Last().ToString();
+						dict[infoPath.Key] = selected;
+					}
 				}
-				//Debug.Log("Succesfully loaded info for " + card.Name + "\nAdded info: " + info.ToString());
+				//Debug.Log("Succesfully loaded info from " + www.url + "\nText: " + www.text);
 				onFinished(dict);
 			}
 			catch (System.Exception) //e)

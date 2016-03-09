@@ -43,7 +43,11 @@ public class CardInfoProvider : MonoBehaviour
 		if (_instance != null) throw new UnityException("Multiple card info providers in the scene.");
 		_instance = this;
 		
-		var autoTypeNameHandling = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto };
+		var autoTypeNameHandling = new JsonSerializerSettings
+		{
+			TypeNameHandling = TypeNameHandling.Auto,
+			Converters = new List<JsonConverter>() { new TokenStringConverter() }
+		};
 		_infoGatherers = JsonConvert.DeserializeObject<List<CardInfoGatherer>>(_infoGatherersFile.text, autoTypeNameHandling);
 		_imageGatherers = JsonConvert.DeserializeObject<List<CardImageGatherer>>(_imageGatherersFile.text, autoTypeNameHandling);
 	}

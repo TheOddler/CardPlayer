@@ -15,7 +15,7 @@ public class CardInfoProviderInspector : Editor
 		GUILayout.Label("Image Gatherers: ");
 		foreach (var gatherer in provider.DebugImageGatherers)
 		{
-			GUILayout.Label(gatherer.TokenString.ToString());
+			GUILayout.Label(gatherer.Url.ToString());
 		}
 	}
 }

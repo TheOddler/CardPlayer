@@ -8,27 +8,22 @@ using Newtonsoft.Json;
 [JsonObject(MemberSerialization.OptIn)]
 public abstract class WWWGatherer<T>
 {
+	TokenString _tokenUrl;
 	[JsonProperty]
-	string _baseUrl;
-	
-	TokenString _tokenString;
-	public TokenString TokenString
+	public string Url
 	{
-		get
-		{
-			if (_tokenString == null) _tokenString = new TokenString(_baseUrl);
-			return _tokenString;
-		}
+		get { return _tokenUrl.Text; }
+		private set { _tokenUrl = new TokenString(value); }
 	}
 	
 	public WWWGatherer(string baseUrl)
 	{
-		_baseUrl = baseUrl;
+		_tokenUrl = new TokenString(baseUrl);
 	}
 	
 	public void GatherFor(CardInfo cardInfo, System.Action<T> onFinished)
 	{
-		IEnumerable<Token> tokens = TokenString.GetAllTokens();
+		IEnumerable<Token> tokens = _tokenUrl.GetAllTokens();
 		// Get values. Also use 'to list' to make sure all are asked for now.
 		List<Updateable<string>> values = tokens.Select(t => cardInfo[t.ID]).ToList();
 		// See if there are still values I need to wait for
@@ -48,7 +43,7 @@ public abstract class WWWGatherer<T>
 		else 
 		{
 			// All values are ready, start the downloading of texture.
-			string url = TokenString.FillWith(cardInfo);
+			string url = _tokenUrl.FillWith(cardInfo);
 			CardInfoProvider.Get.StartCoroutine(DownloadFrom(url, onFinished));
 		}
 	}
@@ -66,6 +61,6 @@ public abstract class WWWGatherer<T>
 
 	public override string ToString()
 	{
-		return base.ToString() + "(" + _baseUrl +")";
+		return base.ToString() + "(" + _tokenUrl + ")";
 	}
 }

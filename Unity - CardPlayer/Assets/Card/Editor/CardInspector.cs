@@ -27,7 +27,7 @@ public class CardInspector : Editor
 			GUILayout.Label("Busy Info Gatherers: ");
 			foreach (var gatherer in cardInfo.DebugBusyGatherers)
 			{
-				GUILayout.Label("Gatherer: " + gatherer.TokenString.ToString());
+				GUILayout.Label("Gatherer: " + gatherer.Url.ToString());
 			}
 		}
 		
