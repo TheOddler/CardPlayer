@@ -24,22 +24,6 @@ public class Player : NetworkBehaviour
 				CmdSpawnCard("Ponder", hit.point);
 			}
 		}*/
-		if (Input.GetKeyDown(KeyCode.D))
-		{
-			NetworkCommander.Get.SendCommand(new DebugCommand());
-		}
-		if (Input.GetKeyDown(KeyCode.Q))
-		{
-			NetworkCommander.Get.SendCommand(new DebugMessageCommand("QQQ"));
-		}
-		if (Input.GetKeyDown(KeyCode.W))
-		{
-			NetworkCommander.Get.SendCommand(new DebugMessageCommand("\\_/\\_/"));
-		}
-		if (Input.GetKeyDown(KeyCode.E))
-		{
-			NetworkCommander.Get.SendCommand(new DebugMessageCommand("USE!"));
-		}
 	}
 
 	/*[Command]
