@@ -6,12 +6,16 @@ public class Player : NetworkBehaviour
 	[SerializeField]
 	private Card _cardPrefab;
 	
-	void Start ()
+	[SyncVar]
+	private Seat _seat;
+	public Seat Seat { get { return _seat; } }
+	
+	public void InitializeAsPlayer(Seat seat)
 	{
 		
 	}
 	
-	void Update ()
+	void Update()
 	{
 		if (!isLocalPlayer) return;
 
